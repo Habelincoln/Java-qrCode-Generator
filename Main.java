@@ -14,6 +14,13 @@ public class Main {
 }
     
     private static final int ERROR_CORRECTION_LENGTH = 15; // Error correction codewords for level L (15 codewords)
+    public static int byteCapacity; 
+    public static int totalDataCodewords;
+    public static int ecCodewordsPerBlock;
+    public static int numBlocksGroup1;
+    public static int dataCodewordsGroup1;
+    public static int numBlocksGroup2;
+    public static int dataCodewordsGroup2;
     public static int version = 0;
     public static int ecLevel = 3;
     public static Scanner userInput = new Scanner(System.in);
@@ -41,14 +48,32 @@ public class Main {
         System.out.print("Please input text:");
         String input = userInput.nextLine(); // Input string
         
-        if (input.length()>151){
+        if (input.length() > 151){
             System.out.println("Text must be under 152 characters.");
             userInput.close();
             return;
         }
+
+        // Step 1: Set the version based on the input length
+        setVersion(input);
+        if (version != -1) {
+            int byteCapacity = BYTE_CAPACITIES[version - 1][ecLevel];
+            int totalDataCodewords = ERROR_CORRECTION_TABLE[version - 1][0];
+            int ecCodewordsPerBlock = ERROR_CORRECTION_TABLE[version - 1][1];
+            int numBlocksGroup1 = ERROR_CORRECTION_TABLE[version - 1][2];
+            int dataCodewordsGroup1 = ERROR_CORRECTION_TABLE[version - 1][3];
+            int numBlocksGroup2 = ERROR_CORRECTION_TABLE[version - 1][4];
+            int dataCodewordsGroup2 = ERROR_CORRECTION_TABLE[version - 1][5];
+            
+            System.out.println("Version: " + version);
+            System.out.println("Byte Capacity: " + byteCapacity);
+            System.out.println("Total bits: " + totalDataCodewords * 8);
+        } else {
+            System.out.println("too long");
+        }
         
-        String encodedData = encodeToBinary(input); // Step 1: Encoded data
-        //System.out.println("Encoded Data: ");
+        String encodedData = encodeToBinary(input);
+        System.out.println("Encoded Data: "+encodedData);
         //System.out.println(formatBinaryWithSpaces(encodedData));
 
         // Step 2: Generate error correction codewords
@@ -66,23 +91,20 @@ public class Main {
         
     }
 
-    public static void setVersion() {
-            
-            if (version != -1) {
-                
-                int byteCapacity = BYTE_CAPACITIES[version - 1][ecLevel];
-                int totalDataCodewords = ERROR_CORRECTION_TABLE[version - 1][0];
-                int ecCodewordsPerBlock = ERROR_CORRECTION_TABLE[version - 1][1];
-                int numBlocksGroup1 = ERROR_CORRECTION_TABLE[version - 1][2];
-                int dataCodewordsGroup1 = ERROR_CORRECTION_TABLE[version - 1][3];
-                int numBlocksGroup2 = ERROR_CORRECTION_TABLE[version - 1][4];
-                int dataCodewordsGroup2 = ERROR_CORRECTION_TABLE[version - 1][5];
-               
-                
-            } 
-            System.out.println("Version: " + version);
-            System.out.println("Error Correction Level: " + ecLevel);
+    public static void setVersion(String input) {
+        int length = input.getBytes().length; // Byte Mode length
+        for (int i = 0; i < BYTE_CAPACITIES.length; i++) {
+            if (length <= BYTE_CAPACITIES[i][ecLevel]) {
+                version = i + 1;
+                break;
+            }
         }
+        if (version == 0) {
+            version = -1;
+        }
+        
+    }
+
     
     public static void placeBit(int[][] QRCode, int y, int x, int value) {
     String text = MyClass.myNumber;
@@ -102,22 +124,34 @@ public class Main {
     public static String encodeToBinary(String input) {
         StringBuilder result = new StringBuilder();
 
-        // Step 1: Add Mode Indicator (Byte Mode)
+        //add mode indicator always
         result.append("0100");
-
-        // Step 2: Add Character Count Indicator (8 bits for Version 3)
-        result.append(toBinary(input.length(), 8));
-
-        // Step 3: Encode each character to 8-bit binary
+        int bitLength = 0;
+        if (version >=1 && version <= 9) {
+        bitLength = 8;
+        } else if (version >=10 && version <= 40) {
+            bitLength = 16;
+        }
+        result.append(toBinary(input.length(), bitLength));
+        
         for (char c : input.toCharArray()) {
-            result.append(toBinary(c, 8));
+            result.append(toBinary(c, bitLength));
         }
 
-        // Step 4: Add Terminator (at least 4 bits)
-        int terminatorBits = Math.min(4, 440 - result.length()); // Version 3 has a maximum of 440 bits
-        for (int i = 0; i < terminatorBits; i++) {
-            result.append('0');
+        // Step 4: Add Terminator Bits
+        while ((totalDataCodewords * 8) - result.length() > 0) {
+            if ((totalDataCodewords * 8) - result.length() >= 4) {
+                result.append("0000");
+                break;
+            } else {
+                result.append('0');
+            }
+            
         }
+        // int terminatorBits = Math.min(4, (totalDataCodewords * 8) - result.length()); 
+        // for (int i = 0; i < terminatorBits; i++) {
+        //     result.append('0');
+        // }
 
         // Step 5: Pad to full byte (8-bit boundary)
         while (result.length() % 8 != 0) {
@@ -131,10 +165,10 @@ public class Main {
         String paddingByte2 = "00010001"; // 0x11
         int currentBitLength = result.length();
 
-        while (currentBitLength < 440) { // Pad until we reach 440 bits
+        while (currentBitLength < (totalDataCodewords * 8)) {
             result.append(paddingByte1);
             currentBitLength += 8;
-            if (currentBitLength < 440) {
+            if (currentBitLength < (totalDataCodewords * 8)) {
                 result.append(paddingByte2);
                 currentBitLength += 8;
             }
@@ -276,49 +310,49 @@ class ReedSolomon {
         return result;
     }
 }
-class QRFrame extends JFrame {
-    public QRFrame(int[][] matrix) {
-        setTitle("QR Code");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 600);
-        setFocusable(true);
-        requestFocusInWindow();
+// class QRFrame extends JFrame {
+//     public QRFrame(int[][] matrix) {
+//         setTitle("QR Code");
+//         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//         setSize(600, 600);
+//         setFocusable(true);
+//         requestFocusInWindow();
 
-        QRPanel panel = new QRPanel(matrix);
-        panel.setBackground(Color.WHITE);
-        add(panel);
+//         QRPanel panel = new QRPanel(matrix);
+//         panel.setBackground(Color.WHITE);
+//         add(panel);
 
-        setVisible(true);
-    }
-}
+//         setVisible(true);
+//     }
+// }
 
-class QRPanel extends JPanel {
-    private int[][] matrix;
+// class QRPanel extends JPanel {
+//     private int[][] matrix;
 
-    public QRPanel(int[][] matrix) {
-        this.matrix = matrix;
-    }
+//     public QRPanel(int[][] matrix) {
+//         this.matrix = matrix;
+//     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        drawQRCode(g);
-    }
+//     @Override
+//     protected void paintComponent(Graphics g) {
+//         super.paintComponent(g);
+//         drawQRCode(g);
+//     }
 
-    private void drawQRCode(Graphics g) {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-        int cellSize = Math.min(getWidth() / cols, getHeight() / rows);
+//     private void drawQRCode(Graphics g) {
+//         int rows = matrix.length;
+//         int cols = matrix[0].length;
+//         int cellSize = Math.min(getWidth() / cols, getHeight() / rows);
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (matrix[i][j] == 1) {
-                    g.setColor(Color.BLACK);
-                } else {
-                    g.setColor(Color.WHITE);
-                }
-                g.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
-            }
-        }
-    }
-}
+//         for (int i = 0; i < rows; i++) {
+//             for (int j = 0; j < cols; j++) {
+//                 if (matrix[i][j] == 1) {
+//                     g.setColor(Color.BLACK);
+//                 } else {
+//                     g.setColor(Color.WHITE);
+//                 }
+//                 g.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+//             }
+//         }
+//     }
+// }
