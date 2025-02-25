@@ -11,7 +11,7 @@ public class Main {
     private static int numBlocksGroup2;
     private static int dataCodewordsGroup2;
     private static int version = 0;
-    private static int ecLevel = 2;
+    private static int ecLevel = 0;
     
     private static Scanner userInput = new Scanner(System.in);
     
@@ -35,7 +35,7 @@ public class Main {
     Scanner userInput = new Scanner(System.in);
 
     // Example input
-    String input = "hello world hi";
+    String input = "hello";
 
     if (input.length() > 151) {
         System.out.println("Text must be under 152 characters.");
@@ -57,13 +57,6 @@ public class Main {
         dataCodewordsGroup2 = ERROR_CORRECTION_TABLE[index][5];
 
         System.out.println("Version: " + version);
-        System.out.println("Byte Capacity: " + byteCapacity);
-        System.out.println("Total Data Codewords: " + totalDataCodewords);
-        System.out.println("EC Codewords Per Block: " + ecCodewordsPerBlock);
-        System.out.println("Num Blocks Group 1: " + numBlocksGroup1);
-        System.out.println("Data Codewords Group 1: " + dataCodewordsGroup1);
-        System.out.println("Num Blocks Group 2: " + numBlocksGroup2);
-        System.out.println("Data Codewords Group 2: " + dataCodewordsGroup2);
     } else {
         System.out.println("too long");
         userInput.close();
@@ -333,7 +326,7 @@ private static String getRemainderBits(int version) {
             0, 7, 7, 7, 7, 7, 7, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0
         };
 
-        int bits = remainderBits[version];
+        int bits = remainderBits[version - 1];
         return "0".repeat(bits);
     }
 
@@ -361,9 +354,9 @@ private static String getRemainderBits(int version) {
         addDarkModule(version);
         addAlignmentPatterns(version);
         addReservedAreas(version);
-        placeData(message);
-
-        printMatrix();
+        // placeData(message);
+        
+        // fillRetard(20,20,0);
         new Display(matrix);
     }
 
@@ -548,53 +541,121 @@ private static String getRemainderBits(int version) {
         filled[8][8] = true;
     }
 
-    private static void printMatrix() {
-        for (int[] row : matrix) {
-            for (int cell : row) {
-                System.out.print(cell == 1 ? "##" : "  ");
-            }
-            System.out.println();
+    // private static void printMatrix() {
+    //     for (int[] row : matrix) {
+    //         for (int cell : row) {
+    //             System.out.print(cell == 1 ? "##" : "  ");
+    //         }
+    //         System.out.println();
+    //     }
+    // }
+
+    // private static void placeData(String message) {
+    //     int size = matrix.length;
+    //     int row = size - 1;
+    //     int col = size - 1;
+    //     boolean goingUp = true;
+    //     int index = 0;
+    //     final int timingCol = 6;
+    //     boolean left = false;
+    
+    //     while (index < message.length()) {
+            
+    //             if (!filled[row][col]) {
+    //                 matrix[row][col] = message.charAt(index) == '1' ? 1 : 0;
+    //                 filled[row][col] = true;
+    //                 index++;
+    //                 nextCell(left, goingUp, index, row, col, timingCol, size);
+    //             } else {
+    //                 nextCell(left, goingUp, index, row, col, timingCol, size);
+    //             }
+    
+    //     }
+    // }
+    // public static void nextCell(boolean left, boolean goingUp, int index, int row, int col, int timingCol, int size) {
+    //     if (left) {
+    //         row += goingUp ? -1 : 1;
+    //         col ++;
+    //         left = false;
+    //         if (row == 0) {
+    //             goingUp = false;
+    //         } else if (row == size - 1) {
+    //             goingUp = true;
+    //         }
+    //     } else {
+    //         // Move left to the next column
+    //         col--;
+            
+    //         if (col == timingCol) {
+    //             col--;
+    //         }
+    //         left = true;
+    //         if (row == 0) {
+    //             goingUp = false;
+    //         } else if (row == size - 1) {
+    //             goingUp = true;
+    //         }
+    //     }
+    
+    //     // Exit if we've left the matrix
+    //     if (col <= 0) return;
+    //     if (index >= message.length()) return;
+    // }
+
+    static boolean upward = true;
+
+    private static void fill(int row, int col, int index, int size) {
+
+        int bit = message.charAt(index) == '1' ? 1 : 0;
+
+        if (!filled[row][col]) {
+            matrix[row][col] = bit;
+            filled[row][col] = true;
+            index++;
+        } 
+        if (row == 0 && (col +1 ) % 2 == 0) {
+            upward = false;
+            fill(row,col-1,index,size);
+            return;
         }
+            if (upward) {
+            if ((col + 1) % 2 != 0) { //if is odd
+                fill(row,col-1,index,size);
+                return;
+            } else {
+                fill(row-1,col-1,index,size);
+                return;
+            }
+
+            
+        } 
+        
+        else {
+
+            // if ((col+1) % 2 != 0) { 
+            //     fill(row,col+1,index,size);
+            //     return;
+            // } else {
+            //     fill(row+1,col+1,index,size);
+            //     return;
+            // }
+
+        }
+            fill(row, col, index, size);
     }
 
-    private static void placeData(String message) {
-        int size = matrix.length;
-        int row = size - 1;
-        int col = size - 1;
-        boolean goingUp = true;
-        int index = 0;
-        final int TIMING_COLUMN = 6; // Vertical timing pattern column (version 1)
-    
-        while (index < message.length() && col >= 0) {
-            if (row >= 0 && row < size) {
-                // Only place data if the position isn't reserved
-                if (!filled[row][col]) {
-                    matrix[row][col] = Character.getNumericValue(message.charAt(index));
-                    filled[row][col] = true;
-                    index++;
-                }
-            }
-    
-            // Move up/down
-            row += goingUp ? -1 : 1;
-    
-            // Handle column boundary
-            if (row < 0 || row >= size) {
-                // Move left to the next column
-                col--;
-    
-                // Skip vertical timing pattern column entirely
-                if (col == TIMING_COLUMN) {
-                    col--;
-                }
-    
-                // Exit if we've left the matrix
-                if (col < 0) break;
-    
-                // Reverse direction for the new column
-                goingUp = !goingUp;
-                row = goingUp ? size - 1 : 0;
-            }
-        }
-    }
+    // public static void fillRetard(int row, int col, int index){
+
+    //     // int bit = message.charAt(index) == '1' ? 1 : 0;
+    //     int bit = 1;
+
+    //     if (!filled[row][col]) {
+    //         matrix[row][col] = bit;
+    //         filled[row][col] = true;
+    //         index++;
+    //     } 
+
+    //     if (col + 1 %2)
+
+    // }
 }
