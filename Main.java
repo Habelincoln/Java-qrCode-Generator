@@ -356,7 +356,7 @@ private static String getRemainderBits(int version) {
         addReservedAreas(version);
         // placeData(message);
         
-        // fillRetard(20,20,0);
+        fillStupid(20,20,0);
         new Display(matrix);
     }
 
@@ -549,113 +549,57 @@ private static String getRemainderBits(int version) {
     //         System.out.println();
     //     }
     // }
-
-    // private static void placeData(String message) {
-    //     int size = matrix.length;
-    //     int row = size - 1;
-    //     int col = size - 1;
-    //     boolean goingUp = true;
-    //     int index = 0;
-    //     final int timingCol = 6;
-    //     boolean left = false;
-    
-    //     while (index < message.length()) {
-            
-    //             if (!filled[row][col]) {
-    //                 matrix[row][col] = message.charAt(index) == '1' ? 1 : 0;
-    //                 filled[row][col] = true;
-    //                 index++;
-    //                 nextCell(left, goingUp, index, row, col, timingCol, size);
-    //             } else {
-    //                 nextCell(left, goingUp, index, row, col, timingCol, size);
-    //             }
-    
-    //     }
-    // }
-    // public static void nextCell(boolean left, boolean goingUp, int index, int row, int col, int timingCol, int size) {
-    //     if (left) {
-    //         row += goingUp ? -1 : 1;
-    //         col ++;
-    //         left = false;
-    //         if (row == 0) {
-    //             goingUp = false;
-    //         } else if (row == size - 1) {
-    //             goingUp = true;
-    //         }
-    //     } else {
-    //         // Move left to the next column
-    //         col--;
-            
-    //         if (col == timingCol) {
-    //             col--;
-    //         }
-    //         left = true;
-    //         if (row == 0) {
-    //             goingUp = false;
-    //         } else if (row == size - 1) {
-    //             goingUp = true;
-    //         }
-    //     }
-    
-    //     // Exit if we've left the matrix
-    //     if (col <= 0) return;
-    //     if (index >= message.length()) return;
-    // }
-
-    static boolean upward = true;
-
-    private static void fill(int row, int col, int index, int size) {
-
-        int bit = message.charAt(index) == '1' ? 1 : 0;
-
+    static boolean up = true;
+    private static void fillStupid(int row, int col, int index) {
+        if (up) {
+        // int bit = Character.getNumericValue(message.charAt(index));
+        if(index != 100){
+        int bit = 1;
         if (!filled[row][col]) {
             matrix[row][col] = bit;
             filled[row][col] = true;
-            index++;
-        } 
-        if (row == 0 && (col +1 ) % 2 == 0) {
-            upward = false;
-            fill(row,col-1,index,size);
-            return;
+        } else {
+            index --;
         }
-            if (upward) {
-            if ((col + 1) % 2 != 0) { //if is odd
-                fill(row,col-1,index,size);
-                return;
-            } else {
-                fill(row-1,col-1,index,size);
-                return;
-            }
 
-            
-        } 
-        
-        else {
+        if (row == 0 && (col + 1) % 2 != 0) { //start going downward
+            System.out.println("hit top, swapping direction");
+            up = false;
+            fillStupid(row, col-2, index + 1); //this shouldnt need -2 idk fix it
+        }
 
-            // if ((col+1) % 2 != 0) { 
-            //     fill(row,col+1,index,size);
-            //     return;
-            // } else {
-            //     fill(row+1,col+1,index,size);
-            //     return;
-            // }
+        if ((col + 1) % 2 != 0){
+        fillStupid(row,col - 1,index +1);
+    } else {
+        fillStupid(row - 1, col + 1, index + 1);
+            }   
+                    }
+        } else {
+
+            if(index != 100){
+                int bit = 1;
+                if (!filled[row][col]) {
+                    matrix[row][col] = bit;
+                    filled[row][col] = true;
+                }
+
+                if (row == 20 && (col + 1) % 2 != 0) { //make this variable  size not 21
+                    System.out.println("hit bottom");
+                    return;
+                } 
+
+                if ((col + 1) % 2 != 0){
+                    fillStupid(row,col - 1,index + 1);
+                } else {
+                    fillStupid(row + 1, col + 1, index + 1);
+                       }  
+
+
 
         }
-            fill(row, col, index, size);
-    }
-
-    // public static void fillRetard(int row, int col, int index){
-
-    //     // int bit = message.charAt(index) == '1' ? 1 : 0;
-    //     int bit = 1;
-
-    //     if (!filled[row][col]) {
-    //         matrix[row][col] = bit;
-    //         filled[row][col] = true;
-    //         index++;
-    //     } 
-
-    //     if (col + 1 %2)
-
-    // }
+       
+    
 }
+
+ }
+ }
