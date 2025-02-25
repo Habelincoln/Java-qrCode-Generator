@@ -2,18 +2,18 @@ import java.util.*;
 
 public class Main {
     
-    public static String encodedData;
-    public static int byteCapacity; 
-    public static int totalDataCodewords;
-    public static int ecCodewordsPerBlock;
-    public static int numBlocksGroup1;
-    public static int dataCodewordsGroup1;
-    public static int numBlocksGroup2;
-    public static int dataCodewordsGroup2;
-    public static int version = 0;
-    public static int ecLevel = 2;
+    private static String encodedData;
+    private static int byteCapacity; 
+    private static int totalDataCodewords;
+    private static int ecCodewordsPerBlock;
+    private static int numBlocksGroup1;
+    private static int dataCodewordsGroup1;
+    private static int numBlocksGroup2;
+    private static int dataCodewordsGroup2;
+    private static int version = 0;
+    private static int ecLevel = 2;
     
-    public static Scanner userInput = new Scanner(System.in);
+    private static Scanner userInput = new Scanner(System.in);
     
     private static final int[][] BYTE_CAPACITIES = {
         {17, 14, 11, 7}, {32, 26, 20, 14}, {53, 42, 32, 24}, {78, 62, 46, 34}, {106, 84, 60, 44},
@@ -35,7 +35,7 @@ public class Main {
     Scanner userInput = new Scanner(System.in);
 
     // Example input
-    String input = "hello world hi ";
+    String input = "hello world hi";
 
     if (input.length() > 151) {
         System.out.println("Text must be under 152 characters.");
@@ -101,11 +101,11 @@ public class Main {
     // Step 6: Print the final message
     System.out.println("Final Message: " + finalMessage);
     userInput.close();
-    // new MatrixBuilder(finalMessage);
+    new MatrixBuilder(finalMessage, version);
     
     }
 
-    public static void setVersion(String input) {
+   private static void setVersion(String input) {
         int length = input.getBytes().length; // Byte Mode length
         for (int i = 0; i < BYTE_CAPACITIES.length; i++) {
             if (length <= BYTE_CAPACITIES[i][ecLevel]) {
@@ -119,7 +119,7 @@ public class Main {
         
     }
     
-    public static String encodeToBinary(String input) {
+    private static String encodeToBinary(String input) {
         StringBuilder result = new StringBuilder();
 
         //add mode indicator always
@@ -133,7 +133,7 @@ public class Main {
         result.append(toBinary(input.length(), bitLength));
         
         for (char c : input.toCharArray()) {
-            result.append(toBinary(c, bitLength));
+            result.append(toBinary(c, 8));
         }
 
         //Step 4: Add Terminator Bits
@@ -185,14 +185,6 @@ public class Main {
     }
 
 
-
-
-
-
-
-
-
-
 // Error-Correction
 
 private static final int[] LOG_TABLE = new int[256];
@@ -227,10 +219,10 @@ private static int gfMultiply(int a, int b) {
 }
 
 // Find the inverse of a number in GF(256)
-public static int gfInverse(int a) {
-    if (a == 0) throw new ArithmeticException("Cannot invert zero.");
-    return EXP_TABLE[FIELD_SIZE - 1 - LOG_TABLE[a]];
-}
+// private static int gfInverse(int a) {
+//     if (a == 0) throw new ArithmeticException("Cannot invert zero.");
+//     return EXP_TABLE[FIELD_SIZE - 1 - LOG_TABLE[a]];
+// }
 
 // Generate the generator polynomial for the given error correction length
 private static int[] generateGeneratorPolynomial(int errorCorrectionLength) {
@@ -256,7 +248,7 @@ private static int[] multiplyPolynomials(int[] a, int[] b) {
 }
 
 // Reed-Solomon encode data
-public static int[] reedSolomonEncode(int[] data, int errorCorrectionLength) {
+private static int[] reedSolomonEncode(int[] data, int errorCorrectionLength) {
     int[] generator = generateGeneratorPolynomial(errorCorrectionLength);
     int[] encoded = Arrays.copyOf(data, data.length + errorCorrectionLength);
 
@@ -334,7 +326,7 @@ private static String interleaveBlocks(List<String[]> dataBlocks, List<String[]>
     return finalMessage.toString();
 }
 
-public static String getRemainderBits(int version) {
+private static String getRemainderBits(int version) {
 
         // The number of required remainder bits for each QR code version
         int[] remainderBits = {
@@ -346,13 +338,19 @@ public static String getRemainderBits(int version) {
     }
 
 }
+
+
+
+
+
+
  class MatrixBuilder {
     static boolean[][] filled;
     static int[][] matrix;
     private static String message;
-    public MatrixBuilder(String text) {
+    public MatrixBuilder(String text, int versionInput) {
         message = text;
-        int version = 1;
+        int version = versionInput;
         int size = 21 + ((version - 1) * 4);
         matrix = new int[size][size];
         filled = new boolean[size][size];
@@ -362,6 +360,7 @@ public static String getRemainderBits(int version) {
         addTimingPatterns();
         addDarkModule(version);
         addAlignmentPatterns(version);
+        addReservedAreas(version);
         placeData(message);
 
         printMatrix();
@@ -420,8 +419,7 @@ public static String getRemainderBits(int version) {
             filled[6][i] = true;
 
             matrix[i][6] = 1;
-            matrix[i][6] = 0;
-
+            filled[i][6] = true;
             } else {
             matrix[6][i] = 0;
             filled[6][i] = true;
@@ -430,12 +428,23 @@ public static String getRemainderBits(int version) {
             filled[i][6] = true;
             }
         }
+
+        // Vertical timing pattern in the 6th column between the top left and bottom left finding patterns
+        for (int i = 8; i < size - 8; i++) {
+            if (i % 2 == 0) {
+            matrix[i][6] = 1;
+            filled[i][6] = true;
+            } else {
+            matrix[i][6] = 0;
+            filled[i][6] = true;
+            }
+        }
+
     }
 
-    private static void addDarkModule(int version) {
-        int size = matrix.length;
-        matrix[size - 8][8] = 1;
-        filled[size - 8][8] = true;
+    private static void addDarkModule(int version) { 
+        matrix[(4 * version) + 9][8] = 1;
+        filled[(4 * version) + 9][8] = true;
     }
 
     private static void addAlignmentPatterns(int version) {
@@ -513,6 +522,32 @@ public static String getRemainderBits(int version) {
         }
     }
 
+    private static void addReservedAreas(int version) {
+
+        
+        for (int i = 0; i < 8; i++) {
+            filled[8][matrix.length - 8 + i] = true;
+        }
+
+      
+        for (int i = (4 * version) + 10; i < matrix.length; i++) {
+            filled[i][8] = true;
+        }
+
+        
+        for (int i = 0; i < 8; i++) {
+            filled[8][i] = true;
+        }
+
+        
+        for (int i = 0; i < 8; i++) {
+            filled[i][8] = true;
+        }
+
+       
+        filled[8][8] = true;
+    }
+
     private static void printMatrix() {
         for (int[] row : matrix) {
             for (int cell : row) {
@@ -523,34 +558,43 @@ public static String getRemainderBits(int version) {
     }
 
     private static void placeData(String message) {
-        
-            int size = matrix.length;
-           
-            int row = size - 1;
-            int col = size - 1;
-            boolean goingUp = true;
-            int index = 0;
+        int size = matrix.length;
+        int row = size - 1;
+        int col = size - 1;
+        boolean goingUp = true;
+        int index = 0;
+        final int TIMING_COLUMN = 6; // Vertical timing pattern column (version 1)
     
-            for (int i = 0; i < message.length(); i++) {
-                if (filled[row][col]) {
-                    col--;
+        while (index < message.length() && col >= 0) {
+            if (row >= 0 && row < size) {
+                // Only place data if the position isn't reserved
+                if (!filled[row][col]) {
+                    matrix[row][col] = Character.getNumericValue(message.charAt(index));
+                    filled[row][col] = true;
+                    index++;
                 }
             }
-        
-        
-    }
-    private static void placeBit(int y, int x, int value) {
-        String text = message;
     
-        // Get the bit value from the text string
-        int bitValue = Character.getNumericValue(text.charAt(value));
-        
-        // Flip the bit if (x + y) is odd
-        if (((x) % 2 != 0)) {
-            bitValue = 1 - bitValue; // Flip 0 to 1, or 1 to 0
+            // Move up/down
+            row += goingUp ? -1 : 1;
+    
+            // Handle column boundary
+            if (row < 0 || row >= size) {
+                // Move left to the next column
+                col--;
+    
+                // Skip vertical timing pattern column entirely
+                if (col == TIMING_COLUMN) {
+                    col--;
+                }
+    
+                // Exit if we've left the matrix
+                if (col < 0) break;
+    
+                // Reverse direction for the new column
+                goingUp = !goingUp;
+                row = goingUp ? size - 1 : 0;
+            }
         }
-    
-        // Place the bit in the QRCode array
-        matrix[x][y] = bitValue;
     }
 }

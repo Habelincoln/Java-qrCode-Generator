@@ -18,7 +18,7 @@ import javax.swing.*;
     }
     
     class QRPanel extends JPanel {
-        private int[][] matrix;
+        final private int[][] matrix;
     
         public QRPanel(int[][] matrix) {
             this.matrix = matrix;
