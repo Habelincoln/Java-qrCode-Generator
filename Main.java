@@ -1,3 +1,4 @@
+import static java.lang.Math.*;
 import java.util.*;
 
 public class Main {
@@ -11,7 +12,8 @@ public class Main {
     private static int numBlocksGroup2;
     private static int dataCodewordsGroup2;
     private static int version = 0;
-    private static int ecLevel = 0;
+    private static int ecLevel = 3;
+    private static int maskType = 0;
     
     private static Scanner userInput = new Scanner(System.in);
     
@@ -35,7 +37,7 @@ public class Main {
     Scanner userInput = new Scanner(System.in);
 
     // Example input
-    String input = "hello";
+    String input = "hello5483yh359dsijoodsijdsijoaskjdhuidhsaudhasiud%***&#54797qv4h h394q3";
 
     if (input.length() > 151) {
         System.out.println("Text must be under 152 characters.");
@@ -93,9 +95,9 @@ public class Main {
 
     // Step 6: Print the final message
     System.out.println("Final Message: " + finalMessage);
+    finalMessage = "1".repeat(finalMessage.length()); //temp set all to 1
     userInput.close();
-    new MatrixBuilder(finalMessage, version);
-    
+    new MatrixBuilder(finalMessage, version, maskType);
     }
 
    private static void setVersion(String input) {
@@ -332,19 +334,18 @@ private static String getRemainderBits(int version) {
 
 }
 
-
-
-
-
-
  class MatrixBuilder {
     static boolean[][] filled;
     static int[][] matrix;
     private static String message;
-    public MatrixBuilder(String text, int versionInput) {
+    private static int printSize;
+    private static int maskType = 7;
+    
+    public MatrixBuilder(String text, int versionInput, int maskVersion) {
         message = text;
         int version = versionInput;
         int size = 21 + ((version - 1) * 4);
+        printSize = size;
         matrix = new int[size][size];
         filled = new boolean[size][size];
 
@@ -353,11 +354,15 @@ private static String getRemainderBits(int version) {
         addTimingPatterns();
         addDarkModule(version);
         addAlignmentPatterns(version);
-        addReservedAreas(version);
+        addReservedAreas(version, size);
         // placeData(message);
         
-        fillStupid(20,20,0);
+        fill(size-1,size-1,0);
+        fillLastBit(message, version, size);
+        
+        // printMatrix();
         new Display(matrix);
+
     }
 
     private static void addFinderPatterns() {
@@ -515,7 +520,7 @@ private static String getRemainderBits(int version) {
         }
     }
 
-    private static void addReservedAreas(int version) {
+    private static void addReservedAreas(int version, int size) {
 
         
         for (int i = 0; i < 8; i++) {
@@ -539,67 +544,312 @@ private static String getRemainderBits(int version) {
 
        
         filled[8][8] = true;
+        
+        
+        if(version > 7){
+            for (int i = size - 12; i <= size - 9; i++) {
+                for (int j = 0; j <= 6; j++) {
+                    filled[i][j] = true;
+                    
+                }
+                
+            }
+            
+            for (int i = 0; i <= 6; i++) {
+                for (int j = size - 11; j <= size -9; j++) {
+                    filled[i][j] = true;
+                }
+            }
+        }
+        
     }
 
     // private static void printMatrix() {
+        
+    //     //border
+    //     System.out.print("\u001B[48;5;11m");
+    //     System.out.println("  ".repeat(printSize + 2)+"\u001B[0m");
+        
     //     for (int[] row : matrix) {
+            
+    //         //border
+    //         System.out.print("\u001B[48;5;11m  \u001B[0m");
+            
     //         for (int cell : row) {
-    //             System.out.print(cell == 1 ? "##" : "  ");
+
+    //             switch (cell){
+    //                 case 1:
+    //                     System.out.print("\u001B[48;5;16m  \u001B[0m");
+    //                 break;
+                    
+    //                 case 0:
+    //                     System.out.print("\u001B[48;5;15m  \u001B[0m");
+    //                 break;
+                    
+    //                 default:  System.out.print("\u001B[48;5;11m  \u001B[0m");
+    //             }
+                
+    //             //System.out.print(cell == 1 ? "\u001B[48;5;16m  " : "\u001B[48;5;15m  ");
     //         }
+            
+    //         //border
+    //         System.out.print("\u001B[48;5;11m  \u001B[0m");
+            
     //         System.out.println();
+            
     //     }
+        
+    //     //border
+    //     System.out.print("\u001B[48;5;11m");
+    //     System.out.println("  ".repeat(printSize + 2)+"\u001B[0m");
+    //     System.out.println("\n total bits: " + message.length());
+        
     // }
+    
     static boolean up = true;
-    private static void fillStupid(int row, int col, int index) {
+    private static void fill(int row, int col, int index) {
+        
+                //int bit = 1;
+                int bit = Character.getNumericValue(message.charAt(index));
+                // bit++;
         if (up) {
-        // int bit = Character.getNumericValue(message.charAt(index));
-        if(index != 100){
-        int bit = 1;
+       
+        if(index <= message.length() && col >= 0) {
+            
         if (!filled[row][col]) {
-            matrix[row][col] = bit;
+            placeBitInPos(row, col, bit);
             filled[row][col] = true;
+            
         } else {
-            index --;
+            index = index - 1;
         }
 
-        if (row == 0 && (col + 1) % 2 != 0) { //start going downward
-            System.out.println("hit top, swapping direction");
+        if (row == 0 && (col + 1) % 2 == 0) { //start going downward
+            
             up = false;
-            fillStupid(row, col-2, index + 1); //this shouldnt need -2 idk fix it
+            if (col == 7) {
+                
+                fillAfterTiming(row, col-2, index + 1);
+                return;
+            }
+            fill(row, col - 1, index + 1); 
+            return;
         }
 
         if ((col + 1) % 2 != 0){
-        fillStupid(row,col - 1,index +1);
+        fill(row,col - 1,index + 1);
+        return;
     } else {
-        fillStupid(row - 1, col + 1, index + 1);
+        fill(row - 1, col + 1, index + 1);
+        return;
             }   
                     }
         } else {
 
-            if(index != 100){
-                int bit = 1;
+            if(index <= message.length() && col >= 0) {
+                
                 if (!filled[row][col]) {
-                    matrix[row][col] = bit;
+                    placeBitInPos(row, col, bit);
                     filled[row][col] = true;
+                    
+                } else {
+                    index = index - 1;
                 }
 
-                if (row == 20 && (col + 1) % 2 != 0) { //make this variable  size not 21
-                    System.out.println("hit bottom");
+                if (row == (printSize - 1) && (col + 1) % 2 == 0) {
+                    up = true; 
+                    
+                    if (col == 7) {
+                        
+                        fillAfterTiming(row, col-2, index + 1);
+                        return;
+                    }
+                    fill(row, col - 1, index + 1);
                     return;
                 } 
 
                 if ((col + 1) % 2 != 0){
-                    fillStupid(row,col - 1,index + 1);
+                    fill(row,col - 1,index + 1);
+                    return;
                 } else {
-                    fillStupid(row + 1, col + 1, index + 1);
+                    fill(row + 1, col + 1, index + 1);
+                    return;
                        }  
+            }
+       
+    
+        }
+    }
+
+       private static void fillAfterTiming(int row, int col, int index) {
+            
+        
+                //int bit = 1;
+                int bit = Character.getNumericValue(message.charAt(index));
+                // bit++;
+        if (up) {
+       
+        if(index <= message.length() -2 && col >= 0) {
+           
+        if (!filled[row][col]) {
+            placeBitInPos(row, col, bit);
+            filled[row][col] = true;
+            
+            
+        } else {
+            index--;
+        }
+
+        if (row == 0 && (col + 1) % 2 != 0) { //start going downward
+            
+            up = false;
+            fillAfterTiming(row, col - 1, index + 1); 
+            return;
+        }
+
+        if ((col + 1) % 2 == 0){
+        fillAfterTiming(row,col - 1,index + 1);
+        return;
+    } else {
+        fillAfterTiming(row - 1, col + 1, index + 1);
+        return;
+            }   
+                    }
+        } else {
+
+            if(index <= message.length() -2 && col >= 0) {
+               
+                if (!filled[row][col]) {
+                    placeBitInPos(row, col, bit);
+                    filled[row][col] = true;
+                    
+                } else {
+                    index = index - 1;
+                }
+
+                if (row == (printSize - 1) && (col + 1) % 2 != 0) {
+                    up = true; 
+                    
+                    fillAfterTiming(row, col - 1, index + 1);
+                    return;
+                } 
+
+                if ((col + 1) % 2 == 0){
+                    fillAfterTiming(row,col - 1,index + 1);
+                    return;
+                } else {
+                    fillAfterTiming(row + 1, col + 1, index + 1);
+                    return;
+                       }  
+            }
+       
+    
+        }
+
+        }
+
+        private static void fillLastBit(String message, int version, int size) {
+
+
+        int bit;
+        if (message.substring(message.length() -1).equals("1")) {
+            bit = 1;
+        } else {
+            bit = 0;
+        }
+
+            if (version > 7) {
+                placeBitInPos(size-11, 0, bit);
+            } else {
+
+            placeBitInPos(size-9, 0, bit);
+            }
+
 
 
 
         }
-       
-    
-}
 
- }
- }
+        private static void placeBitInPos(int row, int col, int bit) {
+            
+            
+            
+            switch(maskType) {
+
+                case 0: 
+                if ((row + col) % 2 == 0) {
+                    if (bit == 1) bit = 0;
+                    else if (bit == 0) bit = 1;
+                }
+                matrix[row][col] = bit;
+                break;
+
+                case 1:
+                if ((row) % 2 == 0) {
+                    if (bit == 1) bit = 0;
+                    else if (bit == 0) bit = 1;
+                    
+                }
+                matrix[row][col] = bit;
+                break;
+
+
+                case 2:
+                if ((col % 3 == 0)) {
+                    if (bit == 1) bit = 0;
+                    else if (bit == 0) bit = 1;
+                }
+                matrix[row][col] = bit;
+                    break;
+
+                case 3:
+                if ((row + col) % 3 == 0) {
+                    if (bit == 1) bit = 0;
+                    else if (bit == 0) bit = 1;
+                }
+                matrix[row][col] = bit;
+                    break;
+
+                case 4:
+                if (( floor(row / 2) + floor(col / 3) ) % 2 == 0) {
+                    if (bit == 1) bit = 0;
+                    else if (bit == 0) bit = 1;
+                }
+                matrix[row][col] = bit;
+                    break;
+
+                case 5:
+                if (((row * col) % 2) + ((row * col) % 3) == 0){
+                    if (bit == 1) bit = 0;
+                    else if (bit == 0) bit = 1;
+                }
+                matrix[row][col] = bit;
+                    break;
+
+                case 6:
+                if ((((row * col) % 2) + ((row * col) % 3) ) % 2 == 0) {
+                    if (bit == 1) bit = 0;
+                    else if (bit == 0) bit = 1;
+                }
+                matrix[row][col] = bit;
+                    break;
+
+                case 7:
+                if (( ((row + col) % 2) + ((row * col) % 3) ) % 2 == 0) {
+                    if (bit == 1) bit = 0;
+                    else if (bit == 0) bit = 1;
+                }
+                matrix[row][col] = bit;
+                    break;
+
+                default:
+                matrix[row][col] = bit;
+
+
+
+            }
+
+
+        }
+
+    }

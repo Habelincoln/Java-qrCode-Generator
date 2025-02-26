@@ -1,4 +1,4 @@
- import java.awt.*;
+import java.awt.*;
 import javax.swing.*;
  public class Display extends JFrame {
         public Display(int[][] matrix) {
@@ -33,7 +33,15 @@ import javax.swing.*;
         private void drawQRCode(Graphics g) {
             int rows = matrix.length;
             int cols = matrix[0].length;
-            int cellSize = Math.min(getWidth() / cols, getHeight() / rows);
+            
+            // Calculate the size that maintains aspect ratio and leaves margin
+            int maxWidth = getWidth() * 9 / 10;  // Use 80% of the window
+            int maxHeight = getHeight() * 9 / 10;
+            int cellSize = Math.min(maxWidth / cols, maxHeight / rows);
+            
+            // Calculate starting position to center the QR code
+            int startX = (getWidth() - (cols * cellSize)) / 2;
+            int startY = (getHeight() - (rows * cellSize)) / 2;
     
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
@@ -42,7 +50,7 @@ import javax.swing.*;
                     } else {
                         g.setColor(Color.WHITE);
                     }
-                    g.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                    g.fillRect(startX + (j * cellSize), startY + (i * cellSize), cellSize, cellSize);
                 }
             }
         }
