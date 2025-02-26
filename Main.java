@@ -37,7 +37,7 @@ public class Main {
     Scanner scanner = new Scanner(System.in);
     // System.out.println("Enter String:");
     // String input = scanner.nextLine();
-    String input = "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";
+    String input = "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";
     scanner.close();
 
 
@@ -91,7 +91,6 @@ public class Main {
 
     // Step 6: Print the final message
     System.out.println("Final Message: " + finalMessage);
-    // finalMessage = "1".repeat(finalMessage.length()); //temp set all to 1
     new MatrixBuilder(finalMessage, version, maskType, ecLevel);
     }
 
@@ -207,12 +206,6 @@ private static int gfMultiply(int a, int b) {
     }
     return expTable[(logTable[a] + logTable[b]) % 255];
 }
-
-// Find the inverse of a number in GF(256)
-// private static int gfInverse(int a) {
-//     if (a == 0) throw new ArithmeticException("Cannot invert zero.");
-//     return expTable[fieldSize - 1 - logTable[a]];
-// }
 
 // Generate the generator polynomial for the given error correction length
 private static int[] generateGeneratorPolynomial(int errorCorrectionLength) {
@@ -430,13 +423,9 @@ private static String getRemainderBits(int version) {
         addDarkModule(version);
         addAlignmentPatterns(version);
         addReservedAreas(version, size);
-        // fill(size-1,size-1,0);
-        // fillLastBit(message, version, size);
-        fillIterative(size -1, size -1, 0, true);
+        fill(size -1, size -1, 0, true);
         addFormatInfo(version, size, ecLevel, maskType);
-
-        // printMatrix(); //for console display
-        new Display(matrix); // for JFrame display
+        new Display(matrix);
 
     }
 
@@ -639,191 +628,7 @@ private static String getRemainderBits(int version) {
         
     }
 
-    // private static void printMatrix() {
-        
-    //     //border
-    //     System.out.print("\u001B[48;5;11m");
-    //     System.out.println("  ".repeat(printSize + 2)+"\u001B[0m");
-        
-    //     for (int[] row : matrix) {
-            
-    //         //border
-    //         System.out.print("\u001B[48;5;11m  \u001B[0m");
-            
-    //         for (int cell : row) {
-
-    //             switch (cell){
-    //                 case 1:
-    //                     System.out.print("\u001B[48;5;16m  \u001B[0m");
-    //                 break;
-                    
-    //                 case 0:
-    //                     System.out.print("\u001B[48;5;15m  \u001B[0m");
-    //                 break;
-                    
-    //                 default:  System.out.print("\u001B[48;5;11m  \u001B[0m");
-    //             }
-                
-    //             //System.out.print(cell == 1 ? "\u001B[48;5;16m  " : "\u001B[48;5;15m  ");
-    //         }
-            
-    //         //border
-    //         System.out.print("\u001B[48;5;11m  \u001B[0m");
-            
-    //         System.out.println();
-            
-    //     }
-        
-    //     //border
-    //     System.out.print("\u001B[48;5;11m");
-    //     System.out.println("  ".repeat(printSize + 2)+"\u001B[0m");
-    //     System.out.println("\n total bits: " + message.length());
-        
-    // }
-    
-    static boolean up = true;
-    // private static void fill(int row, int col, int index) {
-        
-    //             //int bit = 1;
-    //             int bit = Character.getNumericValue(message.charAt(index));
-    //             // bit++;
-    //     if (up) {
-       
-    //     if(index <= message.length() && col >= 0) {
-            
-    //     if (!filled[row][col]) {
-    //         placeBitInPos(row, col, bit);
-    //         filled[row][col] = true;
-            
-    //     } else {
-    //         index = index - 1;
-    //     }
-
-    //     if (row == 0 && (col + 1) % 2 == 0) { //start going downward
-            
-    //         up = false;
-    //         if (col == 7) {
-                
-    //             fillAfterTiming(row, col-2, index + 1);
-    //             return;
-    //         }
-    //         fill(row, col - 1, index + 1); 
-    //         return;
-    //     }
-
-    //     if ((col + 1) % 2 != 0){
-    //     fill(row,col - 1,index + 1);
-    //     return;
-    // } else {
-    //     fill(row - 1, col + 1, index + 1);
-    //     return;
-    //         }   
-    //                 }
-    //     } else {
-
-    //         if(index <= message.length() && col >= 0) {
-                
-    //             if (!filled[row][col]) {
-    //                 placeBitInPos(row, col, bit);
-    //                 filled[row][col] = true;
-                    
-    //             } else {
-    //                 index = index - 1;
-    //             }
-
-    //             if (row == (printSize - 1) && (col + 1) % 2 == 0) {
-    //                 up = true; 
-                    
-    //                 if (col == 7) {
-                        
-    //                     fillAfterTiming(row, col-2, index + 1);
-    //                     return;
-    //                 }
-    //                 fill(row, col - 1, index + 1);
-    //                 return;
-    //             } 
-
-    //             if ((col + 1) % 2 != 0){
-    //                 fill(row,col - 1,index + 1);
-    //                 return;
-    //             } else {
-    //                 fill(row + 1, col + 1, index + 1);
-    //                 return;
-    //                    }  
-    //         }
-       
-    
-    //     }
-    // }
-
-    //    private static void fillAfterTiming(int row, int col, int index) {
-            
-        
-    //             //int bit = 1;
-    //             int bit = Character.getNumericValue(message.charAt(index));
-    //             // bit++;
-    //     if (up) {
-       
-    //     if(index <= message.length() -2 && col >= 0) {
-           
-    //     if (!filled[row][col]) {
-    //         placeBitInPos(row, col, bit);
-    //         filled[row][col] = true;
-            
-            
-    //     } else {
-    //         index--;
-    //     }
-
-    //     if (row == 0 && (col + 1) % 2 != 0) { //start going downward
-            
-    //         up = false;
-    //         fillAfterTiming(row, col - 1, index + 1); 
-    //         return;
-    //     }
-
-    //     if ((col + 1) % 2 == 0){
-    //     fillAfterTiming(row,col - 1,index + 1);
-    //     return;
-    // } else {
-    //     fillAfterTiming(row - 1, col + 1, index + 1);
-    //     return;
-    //         }   
-    //                 }
-    //     } else {
-
-    //         if(index <= message.length() -2 && col >= 0) {
-               
-    //             if (!filled[row][col]) {
-    //                 placeBitInPos(row, col, bit);
-    //                 filled[row][col] = true;
-                    
-    //             } else {
-    //                 index = index - 1;
-    //             }
-
-    //             if (row == (printSize - 1) && (col + 1) % 2 != 0) {
-    //                 up = true; 
-                    
-    //                 fillAfterTiming(row, col - 1, index + 1);
-    //                 return;
-    //             } 
-
-    //             if ((col + 1) % 2 == 0){
-    //                 fillAfterTiming(row,col - 1,index + 1);
-    //                 return;
-    //             } else {
-    //                 fillAfterTiming(row + 1, col + 1, index + 1);
-    //                 return;
-    //                    }  
-    //         }
-       
-    
-    //     }
-
-    //     }
-
-    private static void fillIterative(int startRow, int startCol, int startIndex, boolean startUp) {
+    private static void fill(int startRow, int startCol, int startIndex, boolean startUp) {
         int row = startRow;
         int col = startCol;
         int index = startIndex;
