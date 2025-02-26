@@ -12,7 +12,7 @@ public class Main {
     private static int numBlocksGroup2;
     private static int dataCodewordsGroup2;
     private static int version = 0;
-    private static int ecLevel = 3;
+    private static int ecLevel = 0;
     private static int maskType = 0;
     
     private static Scanner userInput = new Scanner(System.in);
@@ -37,13 +37,7 @@ public class Main {
     Scanner userInput = new Scanner(System.in);
 
     // Example input
-    String input = "hello5483yh359dsijoodsijdsijoaskjdhuidhsaudhasiud%***&#54797qv4h h394q3";
-
-    if (input.length() > 151) {
-        System.out.println("Text must be under 152 characters.");
-        userInput.close();
-        return;
-    }
+    String input = "klmsnawjsfokpdismakewewr9utewfjoi90u8o^*%%**&(*%^*Y*OTgyuhyo87ighkuklmsnawjsfokpdismakewewr9utewfjoi90u8o^*%%**&(*%^*Y*OTgyuhyo87ighkuklmsnawjsfokpdismakewewr9utewfjoi90u8o^*%%**&(*%^*Y*OTgyuhyo87ighku)";
 
     // Step 1: Set the version based on the input length
     setVersion(input);
@@ -95,9 +89,9 @@ public class Main {
 
     // Step 6: Print the final message
     System.out.println("Final Message: " + finalMessage);
-    finalMessage = "1".repeat(finalMessage.length()); //temp set all to 1
+    // finalMessage = "1".repeat(finalMessage.length()); //temp set all to 1
     userInput.close();
-    new MatrixBuilder(finalMessage, version, maskType);
+    new MatrixBuilder(finalMessage, version, maskType, ecLevel);
     }
 
    private static void setVersion(String input) {
@@ -339,12 +333,53 @@ private static String getRemainderBits(int version) {
     static int[][] matrix;
     private static String message;
     private static int printSize;
-    private static int maskType = 7;
+    private static int maskType;
+    private static String[] formatInfo0 = {
+        "111011111000100", // L, 0
+         "111001011110011", // L, 1
+         "111110110101010", // L, 2
+         "111100010011101", // L, 3
+         "110011000101111", // L, 4
+         "110001100011000", // L, 5
+         "110110001000001", // L, 6
+         "110100101110110" // L, 7
+    };
+    private static String[] formatInfo1 = {
+         "101010000010010", // M, 0
+         "101000100100101", // M, 1
+         "101111001111100", // M, 2
+         "101101101001011", // M, 3
+         "100010111111001", // M, 4
+         "100000011001110", // M, 5
+         "100111110010111", // M, 6
+         "100101010100000" // M, 7
+     }; 
+     private static String[] formatInfo2 = {
+         "011010101011111", // Q, 0
+         "011000001101000", // Q, 1
+         "011111100110001", // Q, 2
+         "011101000000110", // Q, 3
+         "010010010110100", // Q, 4
+         "010000110000011", // Q, 5
+         "010111011011010", // Q, 6
+         "010101111101101" // Q, 7
+     };
+     private static String[] formatInfo3 = {
+         "001011010001001", // H, 0
+         "001001110111110", // H, 1
+         "001110011100111", // H, 2
+         "001100111010000", // H, 3
+         "000011101100010", // H, 4
+         "000001001010101", // H, 5
+         "000110100001100", // H, 6
+         "000100000111011"  // H, 7
+    };
     
-    public MatrixBuilder(String text, int versionInput, int maskVersion) {
+    public MatrixBuilder(String text, int versionInput, int maskVersion, int ecLevel) {
         message = text;
         int version = versionInput;
         int size = 21 + ((version - 1) * 4);
+        maskType = maskVersion;
         printSize = size;
         matrix = new int[size][size];
         filled = new boolean[size][size];
@@ -355,13 +390,12 @@ private static String getRemainderBits(int version) {
         addDarkModule(version);
         addAlignmentPatterns(version);
         addReservedAreas(version, size);
-        // placeData(message);
-        
         fill(size-1,size-1,0);
         fillLastBit(message, version, size);
-        
-        // printMatrix();
-        new Display(matrix);
+        addFormatInfo(version, size, ecLevel, maskType);
+
+        // printMatrix(); //for console display
+        new Display(matrix); // for JFrame display
 
     }
 
@@ -748,7 +782,7 @@ private static String getRemainderBits(int version) {
 
         }
 
-        private static void fillLastBit(String message, int version, int size) {
+    private static void fillLastBit(String message, int version, int size) {
 
 
         int bit;
@@ -768,11 +802,9 @@ private static String getRemainderBits(int version) {
 
 
 
-        }
+    }
 
-        private static void placeBitInPos(int row, int col, int bit) {
-            
-            
+    private static void placeBitInPos(int row, int col, int bit) {
             
             switch(maskType) {
 
@@ -844,12 +876,262 @@ private static String getRemainderBits(int version) {
 
                 default:
                 matrix[row][col] = bit;
-
-
-
             }
+    }
 
+    private static void addFormatInfo(int version, int size, int ecLevel, int maskType) {
+        
+        addVersionInfo(version, size);
+        addMaskAndECInfo(ecLevel, maskType, size);
 
         }
+    
 
+        
+    private static void addVersionInfo(int version, int size) {
+            if (version < 7) return;
+
+
+
+
+    }
+
+    private static void addMaskAndECInfo(int ecLevel, int maskType, int size) {
+        String formatString = "";
+        if (ecLevel < 0 || ecLevel > 3) {
+            System.out.println("Invalid error correction level");
+            return;
+        }
+        if (ecLevel == 0) {
+            switch (maskType) {
+                case 0: 
+                    formatString = formatInfo0[0];
+                    System.out.println("format string:" + formatString);
+                    break;
+                
+                case 1:
+                    formatString = formatInfo0[1];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 2:
+                    formatString = formatInfo0[2];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 3:
+                    formatString = formatInfo0[3];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 4:
+                    formatString = formatInfo0[4];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 5:
+                    formatString = formatInfo0[5];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 6:
+                    formatString = formatInfo0[6];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 7:
+                    formatString = formatInfo0[7];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                default:
+                System.out.println("invalid mask type");
+                return;
+            }
+        }
+
+        if (ecLevel == 1) {
+            switch (maskType) {
+                case 0: 
+                    formatString = formatInfo1[0];
+                    System.out.println("format string:" + formatString);
+                    break;
+                
+                case 1:
+                    formatString = formatInfo1[1];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 2:
+                    formatString = formatInfo1[2];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 3:
+                    formatString = formatInfo1[3];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 4:
+                    formatString = formatInfo1[4];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 5:
+                    formatString = formatInfo1[5];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 6:
+                    formatString = formatInfo1[6];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 7:
+                    formatString = formatInfo1[7];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                default:
+                System.out.println("invalid mask type");
+                return;
+            }
+        }
+
+        if (ecLevel == 2) {
+            switch (maskType) {
+                case 0: 
+                    formatString = formatInfo2[0];
+                    System.out.println("format string:" + formatString);
+                    break;
+                
+                case 1:
+                    formatString = formatInfo2[1];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 2:
+                    formatString = formatInfo2[2];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 3:
+                    formatString = formatInfo2[3];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 4:
+                    formatString = formatInfo2[4];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 5:
+                    formatString = formatInfo2[5];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 6:
+                    formatString = formatInfo2[6];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 7:
+                    formatString = formatInfo2[7];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                default:
+                System.out.println("invalid mask type");
+                return;
+            }
+        }
+
+        if (ecLevel == 3) {
+            switch (maskType) {
+                case 0: 
+                    formatString = formatInfo3[0];
+                    System.out.println("format string:" + formatString);
+                    break;
+                
+                case 1:
+                    formatString = formatInfo3[1];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 2:
+                    formatString = formatInfo3[2];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 3:
+                    formatString = formatInfo3[3];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 4:
+                    formatString = formatInfo3[4];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 5:
+                    formatString = formatInfo3[5];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 6:
+                    formatString = formatInfo3[6];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                case 7:
+                    formatString = formatInfo3[7];
+                    System.out.println("format string:" + formatString);
+                    break;
+
+                default:
+                System.out.println("invalid mask type");
+                return;
+            }
+        }
+
+        if (formatString.length() != 15) {
+            throw new IllegalArgumentException("Format string must be 15 bits long.");
+        }
+    
+        matrix[8][0] = Character.getNumericValue(formatString.charAt(0));
+        matrix[8][1] = Character.getNumericValue(formatString.charAt(1));
+        matrix[8][2] = Character.getNumericValue(formatString.charAt(2));
+        matrix[8][3] = Character.getNumericValue(formatString.charAt(3));
+        matrix[8][4] = Character.getNumericValue(formatString.charAt(4));
+        matrix[8][5] = Character.getNumericValue(formatString.charAt(5));
+        matrix[8][7] = Character.getNumericValue(formatString.charAt(6));
+        matrix[8][8] = Character.getNumericValue(formatString.charAt(7));
+        matrix[7][8] = Character.getNumericValue(formatString.charAt(8));
+        matrix[5][8] = Character.getNumericValue(formatString.charAt(9));
+        matrix[4][8] = Character.getNumericValue(formatString.charAt(10));
+        matrix[3][8] = Character.getNumericValue(formatString.charAt(11));
+        matrix[2][8] = Character.getNumericValue(formatString.charAt(12));
+        matrix[1][8] = Character.getNumericValue(formatString.charAt(13));
+        matrix[0][8] = Character.getNumericValue(formatString.charAt(14));
+
+
+        matrix[size-1][8] = Character.getNumericValue(formatString.charAt(0));
+        matrix[size-2][8] = Character.getNumericValue(formatString.charAt(1));
+        matrix[size-3][8] = Character.getNumericValue(formatString.charAt(2));
+        matrix[size-4][8] = Character.getNumericValue(formatString.charAt(3));
+        matrix[size-5][8] = Character.getNumericValue(formatString.charAt(4));
+        matrix[size-6][8] = Character.getNumericValue(formatString.charAt(5));
+        matrix[size-7][8] = Character.getNumericValue(formatString.charAt(6));
+
+        matrix[8][size - 8] = Character.getNumericValue(formatString.charAt(7));
+        matrix[8][size - 7] = Character.getNumericValue(formatString.charAt(8));
+        matrix[8][size - 6] = Character.getNumericValue(formatString.charAt(9));
+        matrix[8][size - 5] = Character.getNumericValue(formatString.charAt(10));
+        matrix[8][size - 4] = Character.getNumericValue(formatString.charAt(11));
+        matrix[8][size - 3] = Character.getNumericValue(formatString.charAt(12));
+        matrix[8][size - 2] = Character.getNumericValue(formatString.charAt(13));
+        matrix[8][size - 1] = Character.getNumericValue(formatString.charAt(14));
+    }
+        
+            
     }
