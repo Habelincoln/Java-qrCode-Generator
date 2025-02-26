@@ -37,7 +37,7 @@ public class Main {
     Scanner userInput = new Scanner(System.in);
 
     // Example input
-    String input = "klmsnawjsfokpdismakewewr9utewfjoi90u8o^*%%**&(*%^*Y*OTgyuhyo87ighkuklmsnawjsfokpdismakewewr9utewfjoi90u8o^*%%**&(*%^*Y*OTgyuhyo87ighkuklmsnawjsfokpdismakewewr9utewfjoi90u8o^*%%**&(*%^*Y*OTgyuhyo87ighku)";
+    String input = "hello";
 
     // Step 1: Set the version based on the input length
     setVersion(input);
@@ -374,6 +374,45 @@ private static String getRemainderBits(int version) {
          "000110100001100", // H, 6
          "000100000111011"  // H, 7
     };
+
+    private static final Map<Integer, String> versionFormats = new HashMap<>();
+
+    static {
+        versionFormats.put(7, "000111110010010100");
+        versionFormats.put(8, "001000010110111100");
+        versionFormats.put(9, "001001101010011001");
+        versionFormats.put(10, "001010010011010011");
+        versionFormats.put(11, "001011101111110110");
+        versionFormats.put(12, "001100011101100010");
+        versionFormats.put(13, "001101100001000111");
+        versionFormats.put(14, "001110011000001101");
+        versionFormats.put(15, "001111100100101000");
+        versionFormats.put(16, "010000101101111000");
+        versionFormats.put(17, "010001010001011101");
+        versionFormats.put(18, "010010101000010111");
+        versionFormats.put(19, "010011010100110010");
+        versionFormats.put(20, "010100100110100110");
+        versionFormats.put(21, "010101011010000011");
+        versionFormats.put(22, "010110100011001001");
+        versionFormats.put(23, "010111011111101100");
+        versionFormats.put(24, "011000111011000100");
+        versionFormats.put(25, "011001000111100001");
+        versionFormats.put(26, "011010111110101011");
+        versionFormats.put(27, "011011000010001110");
+        versionFormats.put(28, "011100110000011010");
+        versionFormats.put(29, "011101001100111111");
+        versionFormats.put(30, "011110110101110101");
+        versionFormats.put(31, "011111001001010000");
+        versionFormats.put(32, "100000100111010101");
+        versionFormats.put(33, "100001011011110000");
+        versionFormats.put(34, "100010100010111010");
+        versionFormats.put(35, "100011011110011111");
+        versionFormats.put(36, "100100101100001011");
+        versionFormats.put(37, "100101010000101110");
+        versionFormats.put(38, "100110101001100100");
+        versionFormats.put(39, "100111010101000001");
+        versionFormats.put(40, "101000110001101001");
+    }
     
     public MatrixBuilder(String text, int versionInput, int maskVersion, int ecLevel) {
         message = text;
@@ -881,21 +920,11 @@ private static String getRemainderBits(int version) {
 
     private static void addFormatInfo(int version, int size, int ecLevel, int maskType) {
         
-        addVersionInfo(version, size);
         addMaskAndECInfo(ecLevel, maskType, size);
-
-        }
-    
-
-        
-    private static void addVersionInfo(int version, int size) {
-            if (version < 7) return;
-
-
-
+        addVersionInfo(version, size);
 
     }
-
+    
     private static void addMaskAndECInfo(int ecLevel, int maskType, int size) {
         String formatString = "";
         if (ecLevel < 0 || ecLevel > 3) {
@@ -1131,6 +1160,50 @@ private static String getRemainderBits(int version) {
         matrix[8][size - 3] = Character.getNumericValue(formatString.charAt(12));
         matrix[8][size - 2] = Character.getNumericValue(formatString.charAt(13));
         matrix[8][size - 1] = Character.getNumericValue(formatString.charAt(14));
+    }
+    private static void addVersionInfo(int version, int size) {
+        if (version < 7) return;
+
+        String vfString = new StringBuilder(versionFormats.get(version)).reverse().toString();
+
+        matrix[0][size-11] = Character.getNumericValue(vfString.charAt(0));
+        matrix[0][size-10] = Character.getNumericValue(vfString.charAt(1));
+        matrix[0][size-9] = Character.getNumericValue(vfString.charAt(2));
+        matrix[1][size-11] = Character.getNumericValue(vfString.charAt(3));
+        matrix[1][size-10] = Character.getNumericValue(vfString.charAt(4));
+        matrix[1][size-9] = Character.getNumericValue(vfString.charAt(5));
+        matrix[2][size-11] = Character.getNumericValue(vfString.charAt(6));
+        matrix[2][size-10] = Character.getNumericValue(vfString.charAt(7));
+        matrix[2][size-9] = Character.getNumericValue(vfString.charAt(8));
+        matrix[3][size-11] = Character.getNumericValue(vfString.charAt(9));
+        matrix[3][size-10] = Character.getNumericValue(vfString.charAt(10));
+        matrix[3][size-9] = Character.getNumericValue(vfString.charAt(11));
+        matrix[4][size-11] = Character.getNumericValue(vfString.charAt(12));
+        matrix[4][size-10] = Character.getNumericValue(vfString.charAt(13));
+        matrix[4][size-9] = Character.getNumericValue(vfString.charAt(14));
+        matrix[5][size-11] = Character.getNumericValue(vfString.charAt(15));
+        matrix[5][size-10] = Character.getNumericValue(vfString.charAt(16));
+        matrix[5][size-9] = Character.getNumericValue(vfString.charAt(17));
+
+        matrix[size-11][0] = Character.getNumericValue(vfString.charAt(0));
+        matrix[size-10][0] = Character.getNumericValue(vfString.charAt(1));
+        matrix[size-9][0] = Character.getNumericValue(vfString.charAt(2));
+        matrix[size-11][1] = Character.getNumericValue(vfString.charAt(3));
+        matrix[size-10][1] = Character.getNumericValue(vfString.charAt(4));
+        matrix[size-9][1] = Character.getNumericValue(vfString.charAt(5));
+        matrix[size-11][2] = Character.getNumericValue(vfString.charAt(6));
+        matrix[size-10][2] = Character.getNumericValue(vfString.charAt(7));
+        matrix[size-9][2] = Character.getNumericValue(vfString.charAt(8));
+        matrix[size-11][3] = Character.getNumericValue(vfString.charAt(9));
+        matrix[size-10][3] = Character.getNumericValue(vfString.charAt(10));
+        matrix[size-9][3] = Character.getNumericValue(vfString.charAt(11));
+        matrix[size-11][4] = Character.getNumericValue(vfString.charAt(12));
+        matrix[size-10][4] = Character.getNumericValue(vfString.charAt(13));
+        matrix[size-9][4] = Character.getNumericValue(vfString.charAt(14));
+        matrix[size-11][5] = Character.getNumericValue(vfString.charAt(15));
+        matrix[size-10][5] = Character.getNumericValue(vfString.charAt(16));
+        matrix[size-9][5] = Character.getNumericValue(vfString.charAt(17));
+
     }
         
             
