@@ -4,7 +4,7 @@ import javax.swing.*;
         public Display(int[][] matrix) {
             setTitle("QR Code");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setSize(600, 600);
+            setSize(800, 800);  // Increased window size
             setFocusable(true);
             setLocationRelativeTo(null);
             requestFocusInWindow();
@@ -34,22 +34,25 @@ import javax.swing.*;
             int rows = matrix.length;
             int cols = matrix[0].length;
             
-            // Calculate the size that maintains aspect ratio and leaves margin
-            int maxWidth = getWidth() * 9 / 10;  // Use 80% of the window
-            int maxHeight = getHeight() * 9 / 10;
-            int cellSize = Math.min(maxWidth / cols, maxHeight / rows);
+            final int MARGIN = 3; // Fixed 3-pixel margin
             
-            // Calculate starting position to center the QR code
+            // Calculate cell size to fill the panel while maintaining the margin
+            int availableWidth = getWidth() - (2 * MARGIN);
+            int availableHeight = getHeight() - (2 * MARGIN);
+            int cellSize = Math.min(availableWidth / cols, availableHeight / rows);
+            
+            // Center the QR code
             int startX = (getWidth() - (cols * cellSize)) / 2;
             int startY = (getHeight() - (rows * cellSize)) / 2;
-    
+
+            // Draw background
+            g.setColor(Color.WHITE);
+            g.fillRect(0, 0, getWidth(), getHeight());
+
+            // Draw QR code
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-                    if (matrix[i][j] == 1) {
-                        g.setColor(Color.BLACK);
-                    } else {
-                        g.setColor(Color.WHITE);
-                    }
+                    g.setColor(matrix[i][j] == 1 ? Color.BLACK : Color.WHITE);
                     g.fillRect(startX + (j * cellSize), startY + (i * cellSize), cellSize, cellSize);
                 }
             }
