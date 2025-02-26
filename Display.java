@@ -7,6 +7,7 @@ import javax.swing.*;
             setSize(600, 600);
             setFocusable(true);
             setLocationRelativeTo(null);
+            setResizable(false);
             requestFocusInWindow();
     
             QRPanel panel = new QRPanel(matrix);
