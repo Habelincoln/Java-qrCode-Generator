@@ -33,18 +33,14 @@ public class Main {
    
     public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
-    // System.out.println("Enter String:");
-    // String input = scanner.nextLine();
-   
-    String input = "Hello ppls";
-    
+    System.out.println("Enter what to turn into QR Code:");
+    String input = scanner.nextLine();
     scanner.close();
    
-    // Step 1: Set the version based on the input length
+    //set the version based on the input length
     setVersion(input);
     if (version != -1) {
         int index = (version - 1) * 4 + ecLevel;
-
         totalDataCodewords = ecTable[index][0];
         ecCodewordsPerBlock = ecTable[index][1];
         numBlocksGroup1 = ecTable[index][2];
@@ -58,15 +54,15 @@ public class Main {
         return;
     }
 
-    // Step 2: Encode the input data into binary
+    // encode the input data into binary
     encodedData = encodeToBinary(input);
 
     String[] dataCodewords = splitIntoCodewords(encodedData);
 
-    // Step 3: Split codewords into blocks
+    // split codewords into blocks
     List<String[]> dataBlocks = splitIntoBlocks(dataCodewords);
 
-    // Step 4: Generate error correction codewords for each block
+    // generate error correction codewords for each block
     List<String[]> eccBlocks = new ArrayList<>();
     for (String[] block : dataBlocks) {
         int[] data = new int[block.length];
@@ -81,7 +77,7 @@ public class Main {
         eccBlocks.add(eccBinary);
     }
 
-    // Step 5: Interleave data and error correction codewords into the final message
+    // interleave data and error correction codewords into the final message
     String finalMessage = interleaveBlocks(dataBlocks, eccBlocks);
     finalMessage = finalMessage + getRemainderBits(version);
 
@@ -89,7 +85,7 @@ public class Main {
     }
 
    private static void setVersion(String input) {
-        int length = input.getBytes().length; // Byte Mode length
+        int length = input.getBytes().length;
         for (int i = 0; i < byteCapacities.length; i++) {
             if (length <= byteCapacities[i][ecLevel]) {
                 version = i + 1;
@@ -119,7 +115,7 @@ public class Main {
             result.append(toBinary(c, 8));
         }
 
-        //Step 4: Add Terminator Bits
+        // add terminator Bits
         while ((totalDataCodewords * 8) - result.length() > 0) {
             if ((totalDataCodewords * 8) - result.length() >= 4) {
                 result.append("0000");
@@ -135,12 +131,12 @@ public class Main {
             result.append('0');
         }
 
-        // Step 5: Pad to full byte (8-bit boundary)
+        // pad to full byte (multiples of 8)
         while (result.length() % 8 != 0) {
             result.append('0');
         }
 
-        // Step 6: Add Padding Bytes (0xEC and 0x11 alternately)
+        // add more padding Bytes (0xEC and 0x11 alternately)
         String paddingByte1 = "11101100"; // 0xEC
         String paddingByte2 = "00010001"; // 0x11
         int currentBitLength = result.length();
@@ -157,7 +153,7 @@ public class Main {
         return result.toString();
     }
 
-     //Converts an integer to a binary string with a fixed number of bits.
+     // convert int to bit string
 
     private static String toBinary(int value, int bitLength) {
         String binaryString = Integer.toBinaryString(value);
@@ -168,13 +164,12 @@ public class Main {
     }
 
 
-// Error-Correction
+// begin ec
 
 private static final int[] logTable = new int[256];
 private static final int[] expTable = new int[256];
-private static final int fieldSize = 256;
 
-// Initialize GF(256) tables
+// initialize GF(256) tables
 static {
     int x = 1;
     for (int i = 0; i < 255; i++) {
@@ -182,18 +177,18 @@ static {
         logTable[x] = i;
         x <<= 1;
         if ((x & 0x100) != 0) {
-            x ^= 0x11D; // XOR with the primitive polynomial x^8 + x^4 + x^3 + x^2 + 1
+            x ^= 0x11D;
         }
     }
     expTable[255] = 1;
 }
 
-// GF(256) addition (XOR)
+
 private static int gfAdd(int a, int b) {
     return a ^ b;
 }
 
-// GF(256) multiplication
+
 private static int gfMultiply(int a, int b) {
     if (a == 0 || b == 0) {
         return 0;
@@ -201,7 +196,7 @@ private static int gfMultiply(int a, int b) {
     return expTable[(logTable[a] + logTable[b]) % 255];
 }
 
-// Generate the generator polynomial for the given error correction length
+
 private static int[] generateGeneratorPolynomial(int errorCorrectionLength) {
     int[] generator = {1};
 
@@ -213,7 +208,7 @@ private static int[] generateGeneratorPolynomial(int errorCorrectionLength) {
     return generator;
 }
 
-// Multiply two polynomials in GF(256)
+
 private static int[] multiplyPolynomials(int[] a, int[] b) {
     int[] result = new int[a.length + b.length - 1];
     for (int i = 0; i < a.length; i++) {
@@ -241,7 +236,7 @@ private static int[] reedSolomonEncode(int[] data, int errorCorrectionLength) {
     return Arrays.copyOfRange(encoded, data.length, encoded.length);
 }
 
-// Split encoded data into codewords
+// split encoded data into codewords 
 private static String[] splitIntoCodewords(String encodedData) {
     int codewordLength = 8; // Each codeword is 8 bits
     int numCodewords = encodedData.length() / codewordLength;
@@ -252,18 +247,18 @@ private static String[] splitIntoCodewords(String encodedData) {
     return codewords;
 }
 
-// Split codewords into blocks
+// split codewords into blocks
 private static List<String[]> splitIntoBlocks(String[] dataCodewords) {
     List<String[]> blocks = new ArrayList<>();
 
-    // Split into Group 1 blocks
+    // split into group 1 blocks
     for (int i = 0; i < numBlocksGroup1; i++) {
         String[] block = new String[dataCodewordsGroup1];
         System.arraycopy(dataCodewords, i * dataCodewordsGroup1, block, 0, dataCodewordsGroup1);
         blocks.add(block);
     }
 
-    // Split into Group 2 blocks (if applicable)
+    // split into group 2 blocks (if there are any)
     if (numBlocksGroup2 > 0) {
         int startIndex = numBlocksGroup1 * dataCodewordsGroup1;
         for (int i = 0; i < numBlocksGroup2; i++) {
@@ -276,11 +271,11 @@ private static List<String[]> splitIntoBlocks(String[] dataCodewords) {
     return blocks;
 }
 
-// Interleave data and error correction codewords into the final message
+// interleave data and error correction codewords into final message
 private static String interleaveBlocks(List<String[]> dataBlocks, List<String[]> eccBlocks) {
     StringBuilder finalMessage = new StringBuilder();
 
-    // Interleave data codewords
+    // interleave data codewords
     int maxDataCodewords = Math.max(dataCodewordsGroup1, dataCodewordsGroup2);
     for (int i = 0; i < maxDataCodewords; i++) {
         for (String[] block : dataBlocks) {
@@ -290,7 +285,7 @@ private static String interleaveBlocks(List<String[]> dataBlocks, List<String[]>
         }
     }
 
-    // Interleave error correction codewords
+    // interleave error correction codewords
     int maxEccCodewords = ecCodewordsPerBlock;
     for (int i = 0; i < maxEccCodewords; i++) {
         for (String[] block : eccBlocks) {
@@ -305,7 +300,7 @@ private static String interleaveBlocks(List<String[]> dataBlocks, List<String[]>
 
 private static String getRemainderBits(int version) {
 
-        // The number of required remainder bits for each QR code version
+        // number of required remainder bits for each QR code version
         int[] remainderBits = {
             0, 7, 7, 7, 7, 7, 7, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0
         };
@@ -322,7 +317,7 @@ private static String getRemainderBits(int version) {
     private static String message;
     private static int printSize;
     private static int maskType;
-    private static String[] formatInfo0 = {
+    final private static String[] formatInfo0 = {
         "111011111000100", // L, 0
          "111001011110011", // L, 1
          "111110110101010", // L, 2
@@ -332,7 +327,7 @@ private static String getRemainderBits(int version) {
          "110110001000001", // L, 6
          "110100101110110" // L, 7
     };
-    private static String[] formatInfo1 = {
+    final private static String[] formatInfo1 = {
          "101010000010010", // M, 0
          "101000100100101", // M, 1
          "101111001111100", // M, 2
@@ -342,7 +337,7 @@ private static String getRemainderBits(int version) {
          "100111110010111", // M, 6
          "100101010100000" // M, 7
      };
-     private static String[] formatInfo2 = {
+     final private static String[] formatInfo2 = {
          "011010101011111", // Q, 0
          "011000001101000", // Q, 1
          "011111100110001", // Q, 2
@@ -352,7 +347,7 @@ private static String getRemainderBits(int version) {
          "010111011011010", // Q, 6
          "010101111101101" // Q, 7
      };
-     private static String[] formatInfo3 = {
+     final private static String[] formatInfo3 = {
          "001011010001001", // H, 0
          "001001110111110", // H, 1
          "001110011100111", // H, 2
@@ -430,7 +425,7 @@ private static String getRemainderBits(int version) {
        
          score = calculatePenalty(matrix);
        
-         System.out.println("Mask: "+i+"|Score: " + score); //remove
+         
        
              if (score < lowestScore){
                  lowestScore = score;
@@ -911,46 +906,37 @@ private static String getRemainderBits(int version) {
             switch (maskType) {
                 case 0:
                     formatString = formatInfo1[0];
-                    System.out.println("format string:" + formatString);
                     break;
                
                 case 1:
                     formatString = formatInfo1[1];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 2:
                     formatString = formatInfo1[2];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 3:
                     formatString = formatInfo1[3];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 4:
                     formatString = formatInfo1[4];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 5:
                     formatString = formatInfo1[5];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 6:
                     formatString = formatInfo1[6];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 7:
                     formatString = formatInfo1[7];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 default:
-                System.out.println("invalid mask type");
                 return;
             }
         }
@@ -959,42 +945,34 @@ private static String getRemainderBits(int version) {
             switch (maskType) {
                 case 0:
                     formatString = formatInfo2[0];
-                    System.out.println("format string:" + formatString);
                     break;
                
                 case 1:
                     formatString = formatInfo2[1];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 2:
                     formatString = formatInfo2[2];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 3:
                     formatString = formatInfo2[3];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 4:
                     formatString = formatInfo2[4];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 5:
                     formatString = formatInfo2[5];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 6:
                     formatString = formatInfo2[6];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 case 7:
                     formatString = formatInfo2[7];
-                    System.out.println("format string:" + formatString);
                     break;
 
                 default:
@@ -1007,42 +985,42 @@ private static String getRemainderBits(int version) {
             switch (maskType) {
                 case 0:
                     formatString = formatInfo3[0];
-                    System.out.println("format string:" + formatString);
+                    
                     break;
                
                 case 1:
                     formatString = formatInfo3[1];
-                    System.out.println("format string:" + formatString);
+                    
                     break;
 
                 case 2:
                     formatString = formatInfo3[2];
-                    System.out.println("format string:" + formatString);
+                    
                     break;
 
                 case 3:
                     formatString = formatInfo3[3];
-                    System.out.println("format string:" + formatString);
+                    
                     break;
 
                 case 4:
                     formatString = formatInfo3[4];
-                    System.out.println("format string:" + formatString);
+                    
                     break;
 
                 case 5:
                     formatString = formatInfo3[5];
-                    System.out.println("format string:" + formatString);
+                    
                     break;
 
                 case 6:
                     formatString = formatInfo3[6];
-                    System.out.println("format string:" + formatString);
+                    
                     break;
 
                 case 7:
                     formatString = formatInfo3[7];
-                    System.out.println("format string:" + formatString);
+                    
                     break;
 
                 default:
