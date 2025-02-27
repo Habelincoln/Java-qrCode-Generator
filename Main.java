@@ -36,7 +36,7 @@ public class Main {
     // System.out.println("Enter String:");
     // String input = scanner.nextLine();
    
-    String input = "Hello ppl";
+    String input = "Hello ppls";
     
     scanner.close();
    
