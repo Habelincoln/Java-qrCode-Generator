@@ -65,17 +65,23 @@ public class Display extends JFrame {
     }
     
     private void saveCleanImage(String filePath) {
-        QRPanel cleanPanel = new QRPanel(matrix);
-        cleanPanel.setBackground(Color.WHITE);
-        cleanPanel.setSize(panel.getWidth(), panel.getHeight());
+        int cellSize = 20; // Increase the cell size for higher resolution
+        int qrSize = matrix.length * cellSize;
         
-        BufferedImage image = new BufferedImage(
-            cleanPanel.getWidth(),
-            cleanPanel.getHeight(),
-            BufferedImage.TYPE_INT_RGB
-        );
+        BufferedImage image = new BufferedImage(qrSize, qrSize, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = image.createGraphics();
         
-        cleanPanel.paint(image.getGraphics());
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, qrSize, qrSize);
+        
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                g2d.setColor(matrix[i][j] == 1 ? Color.BLACK : Color.WHITE);
+                g2d.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            }
+        }
+        
+        g2d.dispose();
         
         try {
             File file = new File(filePath);
