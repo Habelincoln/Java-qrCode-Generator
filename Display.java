@@ -1,10 +1,9 @@
 import java.awt.*;
-import javax.swing.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.awt.Desktop;
+import javax.swing.*;
 
 public class Display extends JFrame {
     private final QRPanel panel;
@@ -37,11 +36,8 @@ public class Display extends JFrame {
         saveButton.setFocusPainted(false); 
         saveButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); 
         
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showSaveDialog();
-            }
+        saveButton.addActionListener((ActionEvent e) -> {
+            showSaveDialog();
         });
         
         buttonPanel.add(saveButton);
