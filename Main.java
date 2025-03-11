@@ -1,22 +1,19 @@
-import static java.lang.Math.floor;
 import java.util.*;
 
 
 public class Main {
    
-    private static String encodedData;
-    private static int totalDataCodewords;
-    private static int ecCodewordsPerBlock;
-    private static int numBlocksGroup1;
-    private static int dataCodewordsGroup1;
-    private static int numBlocksGroup2;
-    private static int dataCodewordsGroup2;
-    private static int version = 0;
-    private static int ecLevel = 0;
-   
-   
-    
-    private static final int[][] byteCapacities = {
+    private   String encodedData;
+    private   int totalDataCodewords;
+    private   int ecCodewordsPerBlock;
+    private   int numBlocksGroup1;
+    private   int dataCodewordsGroup1;
+    private   int numBlocksGroup2;
+    private   int dataCodewordsGroup2;
+    private   int version = 0;
+    private   int ecLevel = 0;
+
+    private final int[][] byteCapacities = {
         {17, 14, 11, 7}, {32, 26, 20, 14}, {53, 42, 32, 24}, {78, 62, 46, 34}, {106, 84, 60, 44},
         {134, 106, 74, 58}, {154, 122, 86, 64}, {192, 152, 108, 84}, {230, 180, 130, 98}, {271, 213, 151, 119},
         {321, 251, 177, 137}, {367, 287, 203, 155}, {425, 331, 241, 177}, {458, 362, 258, 194}, {520, 412, 292, 220},
@@ -27,12 +24,12 @@ public class Main {
         {2431, 1911, 1351, 1051}, {2563, 1989, 1423, 1093}, {2699, 2099, 1499, 1139}, {2809, 2213, 1579, 1219}, {2953, 2331, 1663, 1273}
     };
 
-    private static final int[][] ecTable = {
+    private   final int[][] ecTable = {
     {19, 7, 1, 19, 0, 0}, {16, 10, 1, 16, 0, 0}, {13, 13, 1, 13, 0, 0}, {9, 17, 1, 9, 0, 0}, {34, 10, 1, 34, 0, 0}, {28, 16, 1, 28, 0, 0}, {22, 22, 1, 22, 0, 0}, {16, 28, 1, 16, 0, 0}, {55, 15, 1, 55, 0, 0}, {44, 26, 1, 44, 0, 0}, {34, 18, 2, 17, 0, 0}, {26, 22, 2, 13, 0, 0}, {80, 20, 1, 80, 0, 0}, {64, 18, 2, 32, 0, 0}, {48, 26, 2, 24, 0, 0}, {36, 16, 4, 9, 0, 0}, {108, 26, 1, 108, 0, 0}, {86, 24, 2, 43, 0, 0}, {62, 18, 2, 15, 2, 16}, {46, 22, 2, 11, 2, 12}, {136, 18, 2, 68, 0, 0}, {108, 16, 4, 27, 0, 0}, {76, 24, 4, 19, 0, 0}, {60, 28, 4, 15, 0, 0}, {156, 20, 2, 78, 0, 0}, {124, 18, 4, 31, 0, 0}, {88, 18, 2, 14, 4, 15}, {66, 26, 4, 13, 1, 14}, {194, 24, 2, 97, 0, 0}, {154, 22, 2, 38, 2, 39}, {110, 22, 4, 18, 2, 19}, {86, 26, 4, 14, 2, 15}, {232, 30, 2, 116, 0, 0}, {182, 22, 3, 36, 2, 37}, {132, 20, 4, 16, 4, 17}, {100, 24, 4, 12, 4, 13}, {274, 18, 2, 68, 2, 69}, {216, 26, 4, 43, 1, 44}, {154, 24, 6, 19, 2, 20}, {122, 28, 6, 15, 2, 16}, {324, 20, 4, 81, 0, 0}, {254, 18, 1, 50, 4, 51}, {180, 24, 4, 22, 4, 23}, {140, 22, 3, 12, 8, 13}, {370, 24, 2, 92, 2, 93}, {290, 22, 6, 36, 2, 37}, {206, 20, 4, 20, 6, 21}, {158, 26, 7, 14, 4, 15}, {428, 26, 4, 107, 0, 0}, {334, 22, 8, 37, 1, 38}, {244, 24, 8, 20, 4, 21}, {180, 22, 12, 11, 4, 12}, {461, 30, 3, 115, 1, 116}, {365, 24, 4, 40, 5, 41}, {261, 20, 11, 16, 5, 17}, {197, 24, 11, 12, 5, 13}, {523, 22, 5, 87, 1, 88}, {415, 24, 5, 41, 5, 42}, {295, 30, 5, 24, 7, 25}, {223, 24, 11, 12, 7, 13}, {589, 24, 5, 98, 1, 99}, {453, 28, 7, 45, 3, 46}, {325, 24, 15, 19, 2, 20}, {253, 30, 3, 15, 13, 16},{647, 28, 1, 107, 5, 108}, {507, 28, 10, 46, 1, 47}, {367, 28, 1, 22, 15, 23}, {283, 28, 2, 14, 17, 15}, {721, 30, 5, 120, 1, 121}, {563, 26, 9, 43, 4, 44}, {397, 28, 17, 22, 1, 23}, {313, 28, 2, 14, 19, 15}, {795, 28, 3, 113, 4, 114}, {627, 26, 3, 44, 11, 45}, {445, 26, 17, 21, 4, 22}, {341, 26, 9, 13, 16, 14}, {861, 28, 3, 107, 5, 108}, {669, 26, 3, 41, 13, 42}, {485, 30, 15, 24, 5, 25}, {385, 28, 15, 15, 10, 16}, {932, 28, 4, 116, 4, 117}, {714, 26, 17, 42, 0, 0}, {512, 28, 17, 22, 6, 23}, {406, 30, 19, 16, 6, 17}, {1006, 28, 2, 111, 7, 112}, {782, 28, 17, 46, 0, 0}, {568, 30, 7, 24, 16, 25}, {442, 24, 34, 13, 0, 0}, {1094, 30, 4, 121, 5, 122}, {860, 28, 4, 47, 14, 48}, {614, 30, 11, 24, 14, 25}, {464, 30, 16, 15, 14, 16}, {1174, 30, 6, 117, 4, 118}, {914, 28, 6, 45, 14, 46}, {664, 30, 11, 24, 16, 25}, {514, 30, 30, 16, 2, 17}, {1276, 26, 8, 106, 4, 107}, {1000, 28, 8, 47, 13, 48}, {718, 30, 7, 24, 22, 25}, {538, 30, 22, 15, 13, 16}, {1370, 28, 10, 114, 2, 115}, {1062, 28, 19, 46, 4, 47}, {754, 28, 28, 22, 6, 23}, {596, 30, 33, 16, 4, 17}, {1468, 30, 8, 122, 4, 123}, {1128, 28, 22, 45, 3, 46}, {808, 30, 8, 23, 26, 24}, {628, 30, 12, 15, 28, 16}, {1531, 30, 3, 117, 10, 118}, {1193, 28, 3, 45, 23, 46}, {871, 30, 4, 24, 31, 25}, {661, 30, 11, 15, 31, 16}, {1631, 30, 7, 115, 7, 116}, {1267, 28, 21, 45, 7, 46}, {911, 30, 1, 23, 37, 24}, {701, 30, 19, 15, 26, 16}, {1735, 30, 5, 115, 10, 116}, {1373, 28, 19, 47, 10, 48}, {985, 30, 15, 24, 25, 25}, {745, 30, 23, 15, 25, 16}, {1843, 30, 13, 115, 3, 116}, {1455, 28, 2, 46, 29, 47}, {1033, 30, 42, 24, 1, 25}, {793, 30, 23, 15, 28, 16}, {1955, 30, 17, 115, 0, 0},
     {1541, 28, 10, 46, 23, 47}, {1115, 30, 10, 24, 35, 25}, {845, 30, 19, 15, 35, 16},{2071, 30, 17, 115, 1, 116}, {1631, 28, 14, 46, 24, 47}, {1171, 30, 29, 24, 19, 25}, {901, 30, 11, 15, 46, 16}, {2191, 30, 13, 115, 6, 116}, {1725, 28, 14, 46, 28, 47}, {1231, 30, 44, 24, 7, 25}, {961, 30, 59, 16, 1, 17}, {2306, 30, 12, 121, 7, 122}, {1812, 28, 12, 47, 26, 48}, {1286, 30, 39, 24, 14, 25}, {986, 30, 22, 15, 41, 16}, {2434, 30, 6, 121, 14, 122}, {1914, 28, 6, 47, 34, 48}, {1354, 30, 46, 24, 10, 25}, {1054, 30, 2, 15, 64, 16}, {2566, 30, 17, 122, 4, 123}, {1992, 28, 29, 46, 14, 47}, {1426, 30, 49, 24, 10, 25}, {1096, 30, 24, 15, 46, 16}, {2702, 30, 4, 122, 18, 123}, {2102, 28, 13, 46, 32, 47}, {1502, 30, 48, 24, 14, 25}, {1142, 30, 42, 15, 32, 16}, {2812, 30, 20, 117, 4, 118}, {2216, 28, 40, 47, 7, 48}, {1582, 30, 43, 24, 22, 25}, {1222, 30, 10, 15, 67, 16}, {2956, 30, 19, 118, 6, 119}, {2334, 28, 18, 47, 31, 48}, {1666, 30, 34, 24, 34, 25}, {1276, 30, 20, 15, 61, 16}
 };
-   
-    public static void main(String[] args) {
+
+public Main() {
     Scanner scanner = new Scanner(System.in);
     System.out.println("Enter input:");
     String input = scanner.nextLine();
@@ -84,9 +81,13 @@ public class Main {
     String finalMessage = interleaveBlocks(dataBlocks, eccBlocks);
     finalMessage = finalMessage + getRemainderBits(version);
     new MatrixBuilder(finalMessage, version, ecLevel);
+}
+   
+    public static void main(String[] args) {
+    new Main();
     }
 
-   private static void setVersion(String input) {
+   private   void setVersion(String input) {
         int length = input.getBytes().length;
         for (int i = 0; i < byteCapacities.length; i++) {
             if (length <= byteCapacities[i][ecLevel]) {
@@ -100,7 +101,7 @@ public class Main {
        
     }
    
-    private static String encodeToBinary(String input) {
+    private   String encodeToBinary(String input) {
         StringBuilder result = new StringBuilder();
 
         //add mode indicator always
@@ -157,7 +158,7 @@ public class Main {
 
      // convert int to bit string
 
-    private static String toBinary(int value, int bitLength) {
+    private   String toBinary(int value, int bitLength) {
         String binaryString = Integer.toBinaryString(value);
         while (binaryString.length() < bitLength) {
             binaryString = "0" + binaryString;
@@ -168,11 +169,11 @@ public class Main {
 
 // begin ec
 
-private static final int[] logTable = new int[256];
-private static final int[] expTable = new int[256];
+private   final int[] logTable = new int[256];
+private   final int[] expTable = new int[256];
 
 // initialize GF(256) tables
-static {
+  {
     int x = 1;
     for (int i = 0; i < 255; i++) {
         expTable[i] = x;
@@ -186,12 +187,12 @@ static {
 }
 
 
-private static int gfAdd(int a, int b) {
+private   int gfAdd(int a, int b) {
     return a ^ b;
 }
 
 
-private static int gfMultiply(int a, int b) {
+private   int gfMultiply(int a, int b) {
     if (a == 0 || b == 0) {
         return 0;
     }
@@ -199,7 +200,7 @@ private static int gfMultiply(int a, int b) {
 }
 
 
-private static int[] generateGeneratorPolynomial(int errorCorrectionLength) {
+private   int[] generateGeneratorPolynomial(int errorCorrectionLength) {
     int[] generator = {1};
 
     for (int i = 0; i < errorCorrectionLength; i++) {
@@ -211,7 +212,7 @@ private static int[] generateGeneratorPolynomial(int errorCorrectionLength) {
 }
 
 
-private static int[] multiplyPolynomials(int[] a, int[] b) {
+private   int[] multiplyPolynomials(int[] a, int[] b) {
     int[] result = new int[a.length + b.length - 1];
     for (int i = 0; i < a.length; i++) {
         for (int j = 0; j < b.length; j++) {
@@ -222,7 +223,7 @@ private static int[] multiplyPolynomials(int[] a, int[] b) {
 }
 
 // Reed-Solomon encode data
-private static int[] reedSolomonEncode(int[] data, int errorCorrectionLength) {
+private   int[] reedSolomonEncode(int[] data, int errorCorrectionLength) {
     int[] generator = generateGeneratorPolynomial(errorCorrectionLength);
     int[] encoded = Arrays.copyOf(data, data.length + errorCorrectionLength);
 
@@ -239,7 +240,7 @@ private static int[] reedSolomonEncode(int[] data, int errorCorrectionLength) {
 }
 
 // split encoded data into codewords 
-private static String[] splitIntoCodewords(String encodedData) {
+private   String[] splitIntoCodewords(String encodedData) {
     int codewordLength = 8; // Each codeword is 8 bits
     int numCodewords = encodedData.length() / codewordLength;
     String[] codewords = new String[numCodewords];
@@ -250,7 +251,7 @@ private static String[] splitIntoCodewords(String encodedData) {
 }
 
 // split codewords into blocks
-private static List<String[]> splitIntoBlocks(String[] dataCodewords) {
+private   List<String[]> splitIntoBlocks(String[] dataCodewords) {
     List<String[]> blocks = new ArrayList<>();
 
     // split into group 1 blocks
@@ -274,7 +275,7 @@ private static List<String[]> splitIntoBlocks(String[] dataCodewords) {
 }
 
 // interleave data and error correction codewords into final message
-private static String interleaveBlocks(List<String[]> dataBlocks, List<String[]> eccBlocks) {
+private   String interleaveBlocks(List<String[]> dataBlocks, List<String[]> eccBlocks) {
     StringBuilder finalMessage = new StringBuilder();
 
     // interleave data codewords
@@ -300,7 +301,7 @@ private static String interleaveBlocks(List<String[]> dataBlocks, List<String[]>
     return finalMessage.toString();
 }
 
-private static String getRemainderBits(int version) {
+private   String getRemainderBits(int version) {
 
         // number of required remainder bits for each QR code version
         int[] remainderBits = {
@@ -314,12 +315,12 @@ private static String getRemainderBits(int version) {
 }
 
  class MatrixBuilder {
-    static boolean[][] filled;
-    static int[][] matrix;
-    private static String message;
-    private static int printSize;
-    private static int maskType;
-    final private static String[] formatInfo0 = {
+      boolean[][] filled;
+      int[][] matrix;
+    private   String message;
+    private   int printSize;
+    private   int maskType;
+    final private   String[] formatInfo0 = {
         "111011111000100", // L, 0
          "111001011110011", // L, 1
          "111110110101010", // L, 2
@@ -329,7 +330,7 @@ private static String getRemainderBits(int version) {
          "110110001000001", // L, 6
          "110100101110110" // L, 7
     };
-    final private static String[] formatInfo1 = {
+    final private   String[] formatInfo1 = {
          "101010000010010", // M, 0
          "101000100100101", // M, 1
          "101111001111100", // M, 2
@@ -339,7 +340,7 @@ private static String getRemainderBits(int version) {
          "100111110010111", // M, 6
          "100101010100000" // M, 7
      };
-     final private static String[] formatInfo2 = {
+     final private   String[] formatInfo2 = {
          "011010101011111", // Q, 0
          "011000001101000", // Q, 1
          "011111100110001", // Q, 2
@@ -349,7 +350,7 @@ private static String getRemainderBits(int version) {
          "010111011011010", // Q, 6
          "010101111101101" // Q, 7
      };
-     final private static String[] formatInfo3 = {
+     final private   String[] formatInfo3 = {
          "001011010001001", // H, 0
          "001001110111110", // H, 1
          "001110011100111", // H, 2
@@ -360,9 +361,9 @@ private static String getRemainderBits(int version) {
          "000100000111011"  // H, 7
     };
 
-    private static final Map<Integer, String> versionFormats = new HashMap<>();
+    private   final Map<Integer, String> versionFormats = new HashMap<>();
 
-    static {
+      {
         versionFormats.put(7, "000111110010010100");
         versionFormats.put(8, "001000010110111100");
         versionFormats.put(9, "001001101010011001");
@@ -456,14 +457,14 @@ private static String getRemainderBits(int version) {
 
     }
 
-    private static void addFinderPatterns() {
+    private   void addFinderPatterns() {
         int size = matrix.length;
         addFinderPattern(0, 0);
         addFinderPattern(0, size - 7);
         addFinderPattern(size - 7, 0);
     }
 
-    private static void addFinderPattern(int startRow, int startCol) {
+    private   void addFinderPattern(int startRow, int startCol) {
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 7; j++) {
                 if (i == 0 || i == 6 || j == 0 || j == 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4)) {
@@ -477,7 +478,7 @@ private static String getRemainderBits(int version) {
         }
     }
 
-    private static void addSeparators() {
+    private   void addSeparators() {
         int size = matrix.length;
         for (int i = 0; i < 8; i++) {
             matrix[7][i] = 0;
@@ -500,7 +501,7 @@ private static String getRemainderBits(int version) {
         }
     }
 
-    private static void addTimingPatterns() {
+    private   void addTimingPatterns() {
         int size = matrix.length;
         for (int i = 8; i < size - 8; i++) {
             if (i % 2 == 0) {
@@ -531,12 +532,12 @@ private static String getRemainderBits(int version) {
 
     }
 
-    private static void addDarkModule(int version) {
+    private   void addDarkModule(int version) {
         matrix[(4 * version) + 9][8] = 1;
         filled[(4 * version) + 9][8] = true;
     }
 
-    private static void addAlignmentPatterns(int version) {
+    private   void addAlignmentPatterns(int version) {
         if (version < 2) return;
         int[] alignmentPositions = getAlignmentPositions(version);
         for (int row : alignmentPositions) {
@@ -548,11 +549,11 @@ private static String getRemainderBits(int version) {
         }
     }
 
-    private static boolean isInFinderPatternArea(int row, int col, int size) {
+    private   boolean isInFinderPatternArea(int row, int col, int size) {
         return (row < 7 && col < 7) || (row < 7 && col >= size - 7) || (row >= size - 7 && col < 7);
     }
 
-    private static void addAlignmentPattern(int centerRow, int centerCol) {
+    private   void addAlignmentPattern(int centerRow, int centerCol) {
         for (int i = -2; i <= 2; i++) {
             for (int j = -2; j <= 2; j++) {
                 if (Math.abs(i) == 2 || Math.abs(j) == 2 || (i == 0 && j == 0)) {
@@ -566,7 +567,7 @@ private static String getRemainderBits(int version) {
         }
     }
 
-    private static int[] getAlignmentPositions(int version) {
+    private   int[] getAlignmentPositions(int version) {
         switch (version) {
             case 2: return new int[]{6, 18};
             case 3: return new int[]{6, 22};
@@ -611,7 +612,7 @@ private static String getRemainderBits(int version) {
         }
     }
 
-    private static void addReservedAreas(int version, int size) {
+    private   void addReservedAreas(int version, int size) {
 
        
         for (int i = 0; i < 8; i++) {
@@ -654,7 +655,7 @@ private static String getRemainderBits(int version) {
        
     }
 
-    private static void fill(int startRow, int startCol, int startIndex, boolean startUp) {
+    private   void fill(int startRow, int startCol, int startIndex, boolean startUp) {
         int row = startRow;
         int col = startCol;
         int index = startIndex;
@@ -776,7 +777,7 @@ private static String getRemainderBits(int version) {
         }
     }
 
-    private static void placeBitInPos(int row, int col, int bit) {
+    private   void placeBitInPos(int row, int col, int bit) {
            
             switch(maskType) {
 
@@ -815,7 +816,7 @@ private static String getRemainderBits(int version) {
                     break;
 
                 case 4:
-                if (( floor(row / 2) + floor(col / 3) ) % 2 == 0) {
+                if (( Math.floor(row / 2) + Math.floor(col / 3) ) % 2 == 0) {
                     if (bit == 1) bit = 0;
                     else if (bit == 0) bit = 1;
                 }
@@ -851,14 +852,14 @@ private static String getRemainderBits(int version) {
             }
     }
 
-    private static void addFormatInfo(int version, int size, int ecLevel, int maskType) {
+    private   void addFormatInfo(int version, int size, int ecLevel, int maskType) {
        
         addMaskAndECInfo(ecLevel, maskType, size);
         addVersionInfo(version, size);
 
     }
    
-    private static void addMaskAndECInfo(int ecLevel, int maskType, int size) {
+    private   void addMaskAndECInfo(int ecLevel, int maskType, int size) {
         String formatString = "";
         if (ecLevel < 0 || ecLevel > 3) {
             System.out.println("Invalid error correction level");
@@ -1069,7 +1070,7 @@ private static String getRemainderBits(int version) {
         matrix[8][size - 2] = Character.getNumericValue(formatString.charAt(13));
         matrix[8][size - 1] = Character.getNumericValue(formatString.charAt(14));
     }
-    private static void addVersionInfo(int version, int size) {
+    private   void addVersionInfo(int version, int size) {
         if (version < 7) return;
 
         String vfString = new StringBuilder(versionFormats.get(version)).reverse().toString();
@@ -1114,7 +1115,7 @@ private static String getRemainderBits(int version) {
 
     }
    
-    private static int evaluateCondition1(int[][] matrix) {
+    private   int evaluateCondition1(int[][] matrix) {
         int penalty = 0;
 
         // Check rows
@@ -1134,7 +1135,7 @@ private static String getRemainderBits(int version) {
         return penalty;
     }
 
-    private static int evaluateLine(int[] line) {
+    private   int evaluateLine(int[] line) {
         int penalty = 0;
         int count = 1;
         int current = line[0];
@@ -1156,7 +1157,7 @@ private static String getRemainderBits(int version) {
         return penalty;
     }
    
-    private static int evaluateCondition2(int[][] matrix) {
+    private   int evaluateCondition2(int[][] matrix) {
         int penalty = 0;
 
         // Iterate through the matrix to find 2x2 blocks
@@ -1174,7 +1175,7 @@ private static String getRemainderBits(int version) {
         return penalty;
     }
 
-    private static int evaluateCondition3(int[][] matrix) {
+    private   int evaluateCondition3(int[][] matrix) {
         int penalty = 0;
 
         // Define the two patterns to look for
@@ -1200,7 +1201,7 @@ private static String getRemainderBits(int version) {
         return penalty;
     }
 
-    private static int countPatternInLine(int[] line, int[] pattern) {
+    private   int countPatternInLine(int[] line, int[] pattern) {
         int penalty = 0;
         int patternLength = pattern.length;
 
@@ -1221,7 +1222,7 @@ private static String getRemainderBits(int version) {
         return penalty;
     }
    
-    private static int evaluateCondition4(int[][] matrix) {
+    private   int evaluateCondition4(int[][] matrix) {
         int totalModules = matrix.length * matrix[0].length;
         int darkModules = 0;
 
@@ -1253,7 +1254,7 @@ private static String getRemainderBits(int version) {
         return penalty;
     }
    
-    private static int calculatePenalty(int[][] maskedMatrix){
+    private   int calculatePenalty(int[][] maskedMatrix){
         return (evaluateCondition1(maskedMatrix) + evaluateCondition2(maskedMatrix) + evaluateCondition3(maskedMatrix) + evaluateCondition4(maskedMatrix));
     }
        
