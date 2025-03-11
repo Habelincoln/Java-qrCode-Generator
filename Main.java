@@ -83,7 +83,6 @@ public class Main {
     // interleave data and error correction codewords into the final message
     String finalMessage = interleaveBlocks(dataBlocks, eccBlocks);
     finalMessage = finalMessage + getRemainderBits(version);
-
     new MatrixBuilder(finalMessage, version, ecLevel);
     }
 
@@ -449,6 +448,7 @@ private static String getRemainderBits(int version) {
             fill(size -1, size -1, 0, true);
        
             addFormatInfo(version, size, ecLevel, maskType);
+            System.out.println("Final message: " + message);
            
             new Display(matrix);
            
@@ -622,7 +622,6 @@ private static String getRemainderBits(int version) {
         for (int i = (4 * version) + 10; i < matrix.length; i++) {
             filled[i][8] = true;
         }
-
        
         for (int i = 0; i < 8; i++) {
             filled[8][i] = true;
@@ -638,7 +637,7 @@ private static String getRemainderBits(int version) {
        
        
         if(version > 7){
-            for (int i = size - 12; i <= size - 9; i++) {
+            for (int i = size - 11; i <= size - 9; i++) {
                 for (int j = 0; j <= 6; j++) {
                     filled[i][j] = true;
                    
