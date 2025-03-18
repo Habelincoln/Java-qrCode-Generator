@@ -785,25 +785,27 @@ function QR.print(matrix)
         print(table.concat(line))
     end
 end
---[[ Main Execution ]]--
+function main(message) --[[ Main Execution ]]--
 print("QR Code Generator")
-print("-----------------")
+    print("-----------------")
 
--- Get user input
-io.write("Enter text to encode: ")
-local input = io.read()
-io.write("Error correction level (0=L, 1=M, 2=Q, 3=H): ")
-local ecLevel = tonumber(io.read()) or 0
+    -- io.write("Enter text to encode: ")
+    -- local input = io.read()
+    local input = message
+    io.write("Error correction level (0=L, 1=M, 2=Q, 3=H): ")
+    local ecLevel = tonumber(io.read()) or 0
 
--- Generate and display
-local matrix, err = QR.generate(input, ecLevel)
-if not matrix then
-    print("\nError:", err)
-    return
+    -- Generate and display
+    local matrix, err = QR.generate(input, ecLevel)
+    if not matrix then
+        print("\nError:", err)
+        return
+    end
+    QR.printDebug(matrix)
+    print("\nQR Code saved as qrcode.html")
+    QR.saveAsHTML(matrix)
+    os.execute("start qrcode.html")
+
+    return QR
 end
-QR.printDebug(matrix)
-print("\nQR Code saved as qrcode.html")
-QR.saveAsHTML(matrix)
-os.execute("start qrcode.html")
-
-return QR
+main()
