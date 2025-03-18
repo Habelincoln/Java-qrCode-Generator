@@ -169,8 +169,8 @@ public Main() {
 
 // begin ec
 
-private   final int[] logTable = new int[256];
-private   final int[] expTable = new int[256];
+private final int[] logTable = new int[256];
+private final int[] expTable = new int[256];
 
 // initialize GF(256) tables
   {
@@ -451,7 +451,14 @@ private   String getRemainderBits(int version) {
             addFormatInfo(version, size, ecLevel, maskType);
             System.out.println("Final message: " + message);
            
-            new Display(matrix);
+            // new Display(matrix);
+            //print matrix
+            for (int i = 0; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[i].length; j++) {
+                    System.out.print(matrix[i][j] + " ");
+                }
+                System.out.println();
+            }
            
             System.out.println("Selected Mask: " + maskType);
 
@@ -655,7 +662,7 @@ private   String getRemainderBits(int version) {
        
     }
 
-    private   void fill(int startRow, int startCol, int startIndex, boolean startUp) {
+    private void fill(int startRow, int startCol, int startIndex, boolean startUp) {
         int row = startRow;
         int col = startCol;
         int index = startIndex;

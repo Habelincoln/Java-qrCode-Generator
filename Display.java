@@ -1,9 +1,10 @@
 import java.awt.*;
+import javax.swing.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.*;
+import java.awt.Desktop;
 
 public class Display extends JFrame {
     private final QRPanel panel;
@@ -36,8 +37,11 @@ public class Display extends JFrame {
         saveButton.setFocusPainted(false); 
         saveButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); 
         
-        saveButton.addActionListener((ActionEvent e) -> {
-            showSaveDialog();
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showSaveDialog();
+            }
         });
         
         buttonPanel.add(saveButton);
@@ -65,23 +69,17 @@ public class Display extends JFrame {
     }
     
     private void saveCleanImage(String filePath) {
-        int cellSize = 20; // Increase the cell size for higher resolution
-        int qrSize = matrix.length * cellSize;
+        QRPanel cleanPanel = new QRPanel(matrix);
+        cleanPanel.setBackground(Color.WHITE);
+        cleanPanel.setSize(panel.getWidth(), panel.getHeight());
         
-        BufferedImage image = new BufferedImage(qrSize, qrSize, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = image.createGraphics();
+        BufferedImage image = new BufferedImage(
+            cleanPanel.getWidth(),
+            cleanPanel.getHeight(),
+            BufferedImage.TYPE_INT_RGB
+        );
         
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, qrSize, qrSize);
-        
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                g2d.setColor(matrix[i][j] == 1 ? Color.BLACK : Color.WHITE);
-                g2d.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
-            }
-        }
-        
-        g2d.dispose();
+        cleanPanel.paint(image.getGraphics());
         
         try {
             File file = new File(filePath);
